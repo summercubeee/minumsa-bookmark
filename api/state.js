@@ -1,5 +1,6 @@
 const { Redis } = require("@upstash/redis");
 const { getSession } = require("./_session");
+const { getProfile, AVATAR_COUNT } = require("./_profile");
 
 const redis = Redis.fromEnv();
 
@@ -33,7 +34,12 @@ async function getLeaderboard() {
   }
   if (entries.length === 0) return [];
   const names = await redis.hmget("user_names", ...entries.map((e) => e.uid));
-  return entries.map((e) => ({ name: (names && names[e.uid]) || "이용자", count: e.count }));
+  const avatars = await redis.hmget("user_avatars", ...entries.map((e) => e.uid));
+  return entries.map((e) => ({
+    name: (names && names[e.uid]) || "이용자",
+    avatar: Number((avatars && avatars[e.uid]) || 0),
+    count: e.count,
+  }));
 }
 
 async function getState(uid) {
@@ -64,6 +70,13 @@ async function getState(uid) {
   return { checklist, trades: parseHash(tradesRaw), restocks: parseHash(restocksRaw), myOwned, leaderboard };
 }
 
+async function withMe(state, uid) {
+  const profile = await getProfile(redis, uid);
+  const unread = await redis.llen(`inbox:${uid}`).catch(() => 0);
+  state.me = { uid, name: profile.nickname, avatar: profile.avatar, avatarCount: AVATAR_COUNT, unread: unread || 0 };
+  return state;
+}
+
 module.exports = async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
 
@@ -71,7 +84,11 @@ module.exports = async (req, res) => {
     try {
       const session = getSession(req);
       const state = await getState(session && session.uid);
-      state.me = session ? { uid: session.uid, name: session.name } : null;
+      if (session) {
+        await withMe(state, session.uid);
+      } else {
+        state.me = null;
+      }
       res.status(200).json(state);
     } catch (err) {
       res.status(500).json({ error: "server_error" });
@@ -94,6 +111,8 @@ module.exports = async (req, res) => {
     const type = body.type;
 
     try {
+      const profile = await getProfile(redis, session.uid);
+
       if (type === "identify") {
         const id = Number(body.id);
         if (!Number.isInteger(id) || id < 1 || id > 20) {
@@ -107,7 +126,7 @@ module.exports = async (req, res) => {
           return;
         }
         await redis.hset("checklist", {
-          [String(id)]: JSON.stringify({ title, note: note || null, byUid: session.uid, byName: session.name }),
+          [String(id)]: JSON.stringify({ title, note: note || null, byUid: session.uid, byName: profile.nickname }),
         });
       } else if (type === "trade") {
         const have = clean(body.have, 60);
@@ -119,7 +138,10 @@ module.exports = async (req, res) => {
           return;
         }
         const id = String(Date.now()) + Math.random().toString(36).slice(2, 6);
-        const entry = { id, have, want, gu, note: note || null, ts: Date.now(), authorUid: session.uid, authorName: session.name };
+        const entry = {
+          id, have, want, gu, note: note || null, ts: Date.now(),
+          authorUid: session.uid, authorName: profile.nickname, authorAvatar: profile.avatar,
+        };
         await redis.hset("trades", { [id]: JSON.stringify(entry) });
       } else if (type === "restock") {
         const gu = clean(body.gu, 10);
@@ -130,7 +152,10 @@ module.exports = async (req, res) => {
           return;
         }
         const id = String(Date.now()) + Math.random().toString(36).slice(2, 6);
-        const entry = { id, gu, time, note: note || null, ts: Date.now(), authorUid: session.uid, authorName: session.name };
+        const entry = {
+          id, gu, time, note: note || null, ts: Date.now(),
+          authorUid: session.uid, authorName: profile.nickname, authorAvatar: profile.avatar,
+        };
         await redis.hset("restocks", { [id]: JSON.stringify(entry) });
       } else if (type === "delete_trade" || type === "delete_restock") {
         const key = type === "delete_trade" ? "trades" : "restocks";
@@ -160,15 +185,32 @@ module.exports = async (req, res) => {
         const newCount = await redis.scard(key);
         await Promise.all([
           redis.zadd("leaderboard", { score: newCount, member: session.uid }),
-          redis.hset("user_names", { [session.uid]: session.name }),
+          redis.hset("user_names", { [session.uid]: profile.nickname }),
+          redis.hset("user_avatars", { [session.uid]: String(profile.avatar) }),
         ]);
+      } else if (type === "set_nickname") {
+        const nickname = clean(body.nickname, 20);
+        if (!nickname || nickname.length < 2) {
+          res.status(400).json({ error: "invalid_nickname" });
+          return;
+        }
+        await redis.hset(`profile:${session.uid}`, { nickname });
+        await redis.hset("user_names", { [session.uid]: nickname });
+      } else if (type === "set_avatar") {
+        const avatar = Number(body.avatar);
+        if (!Number.isInteger(avatar) || avatar < 0 || avatar >= AVATAR_COUNT) {
+          res.status(400).json({ error: "invalid_avatar" });
+          return;
+        }
+        await redis.hset(`profile:${session.uid}`, { avatar: String(avatar) });
+        await redis.hset("user_avatars", { [session.uid]: String(avatar) });
       } else {
         res.status(400).json({ error: "unknown_type" });
         return;
       }
 
       const state = await getState(session.uid);
-      state.me = { uid: session.uid, name: session.name };
+      await withMe(state, session.uid);
       res.status(200).json(state);
     } catch (err) {
       res.status(500).json({ error: "server_error" });

@@ -8,104 +8,135 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔖</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=98457af62383630861d01942fe5c8018&autoload=false"></script>
 <style>
+  @font-face {
+    font-family: 'Jalnan2';
+    src: url('/assets/fonts/Jalnan2TTF.ttf') format('truetype');
+    font-weight: 400 800;
+    font-display: swap;
+  }
   :root {
-    --paper: #f1efe4; --paper-raised: #e9e5d5; --ink: #221f19; --ink-soft: #57503f;
-    --rule: #d8d2bd; --accent: #2f4a3d; --accent-soft: #e4ebe6; --wine: #7a2e2e;
-    --wine-soft: #f3e6e3; --brass: #a9822f; --lit: #2b3a55; --poem: #7a2e2e;
-    --shadow: 0 1px 0 rgba(34,31,25,0.06), 0 8px 20px -14px rgba(34,31,25,0.35);
+    --paper: #fff6ef; --paper-raised: #ffece1; --ink: #4a332f; --ink-soft: #a08a80;
+    --rule: #f3ddcd; --accent: #ff7a93; --accent-soft: #ffe3ea; --wine: #e8546f;
+    --wine-soft: #ffe1e7; --brass: #f0a63e; --lit: #97a9e8; --poem: #f2a0b3;
+    --mint: #7fd6ae; --mint-soft: #e2f7ee;
+    --shadow: 0 2px 0 rgba(74,51,47,0.04), 0 14px 26px -18px rgba(255,122,147,0.45);
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --paper: #191712; --paper-raised: #221f19; --ink: #ece7d9; --ink-soft: #b6ae9a;
-      --rule: #3a352b; --accent: #7fae97; --accent-soft: #23302a; --wine: #d68f8f;
-      --wine-soft: #322220; --brass: #d3ac5c; --lit: #9fb0d1; --poem: #d68f8f;
-      --shadow: 0 1px 0 rgba(0,0,0,0.4), 0 8px 24px -14px rgba(0,0,0,0.6);
+      --paper: #241a1d; --paper-raised: #34252a; --ink: #f6e8e2; --ink-soft: #c9aea5;
+      --rule: #4a3540; --accent: #ff9fb2; --accent-soft: #3d2830; --wine: #ff9daf;
+      --wine-soft: #402a30; --brass: #f0c674; --lit: #b7c4f2; --poem: #f7bcca;
+      --mint: #9fe4c4; --mint-soft: #23352e;
+      --shadow: 0 2px 0 rgba(0,0,0,0.3), 0 14px 26px -18px rgba(0,0,0,0.6);
     }
   }
   :root[data-theme="dark"] {
-    --paper: #191712; --paper-raised: #221f19; --ink: #ece7d9; --ink-soft: #b6ae9a;
-    --rule: #3a352b; --accent: #7fae97; --accent-soft: #23302a; --wine: #d68f8f;
-    --wine-soft: #322220; --brass: #d3ac5c; --lit: #9fb0d1; --poem: #d68f8f;
-    --shadow: 0 1px 0 rgba(0,0,0,0.4), 0 8px 24px -14px rgba(0,0,0,0.6);
+    --paper: #241a1d; --paper-raised: #34252a; --ink: #f6e8e2; --ink-soft: #c9aea5;
+    --rule: #4a3540; --accent: #ff9fb2; --accent-soft: #3d2830; --wine: #ff9daf;
+    --wine-soft: #402a30; --brass: #f0c674; --lit: #b7c4f2; --poem: #f7bcca;
+    --mint: #9fe4c4; --mint-soft: #23352e;
+    --shadow: 0 2px 0 rgba(0,0,0,0.3), 0 14px 26px -18px rgba(0,0,0,0.6);
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; line-height: 1.6; -webkit-font-smoothing: antialiased; }
-  .wrap { max-width: 760px; margin: 0 auto; padding: 48px 20px 96px; }
-  .display { font-family: 'Nanum Myeongjo', serif; text-wrap: balance; }
-  h1.display { font-size: clamp(28px, 6vw, 40px); font-weight: 800; margin: 0 0 6px; letter-spacing: -0.01em; }
-  .kicker { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass); font-weight: 600; margin: 0 0 10px; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Gowun Dodum', 'Noto Sans KR', 'Malgun Gothic', sans-serif; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 48px 20px 96px; position: relative; }
+  .wrap::before {
+    content: ""; position: absolute; top: -60px; right: -80px; width: 280px; height: 280px;
+    background: radial-gradient(circle, var(--accent-soft) 0%, transparent 72%);
+    border-radius: 50%; z-index: -1; pointer-events: none;
+  }
+  .display { font-family: 'Jalnan2', 'Gowun Dodum', sans-serif; text-wrap: balance; }
+  h1.display { font-size: clamp(28px, 6vw, 40px); font-weight: 400; margin: 0 0 10px; letter-spacing: -0.01em; }
+  .kicker { font-size: 12px; letter-spacing: 0.1em; color: var(--brass); font-weight: 700; margin: 0 0 10px; }
   .lede { color: var(--ink-soft); font-size: 15.5px; margin: 0 0 22px; max-width: 58ch; }
+  .lede b { color: var(--accent); }
   .factrow { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
-  .chip { display: inline-flex; align-items: center; gap: 6px; background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 999px; padding: 6px 12px; font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 999px; padding: 7px 13px; font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
   .chip b { color: var(--ink); font-weight: 700; }
   .chip.warn { border-color: var(--wine); color: var(--wine); background: var(--wine-soft); }
   section { margin-top: 56px; }
-  .sechead { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 4px; border-bottom: 2px solid var(--ink); padding-bottom: 10px; }
-  .sechead h2 { font-family: 'Nanum Myeongjo', serif; font-size: 22px; font-weight: 700; margin: 0; }
+  .sechead { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 4px; border-bottom: 3px solid var(--accent-soft); padding-bottom: 12px; }
+  .sechead h2 { font-family: 'Jalnan2', 'Gowun Dodum', sans-serif; font-size: 21px; font-weight: 400; margin: 0; }
   .sechead .count { font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
   .secnote { color: var(--ink-soft); font-size: 13.5px; margin: 10px 0 20px; }
   .shelf-group { margin-top: 22px; }
-  .shelf-label { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; margin-bottom: 10px; }
+  .shelf-label { font-size: 12px; letter-spacing: 0.06em; color: var(--ink-soft); font-weight: 700; margin-bottom: 10px; }
   .shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 10px; }
-  .spine { background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 6px; padding: 12px 8px 10px; min-height: 118px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; cursor: pointer; text-align: center; box-shadow: var(--shadow); transition: transform 0.12s ease; font: inherit; color: inherit; width: 100%; }
-  .spine:hover { transform: translateY(-2px); }
+  .spine { background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 16px; padding: 12px 8px 10px; min-height: 118px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; cursor: pointer; text-align: center; box-shadow: var(--shadow); transition: transform 0.15s ease; font: inherit; color: inherit; width: 100%; }
+  .spine:hover { transform: translateY(-3px) rotate(-1deg); }
   .spine:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .spine .band { width: 22px; height: 5px; border-radius: 3px; margin-bottom: 8px; }
-  .spine .num { font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: 20px; color: var(--ink-soft); }
+  .spine .band { width: 24px; height: 6px; border-radius: 999px; margin-bottom: 8px; }
+  .spine .num { font-family: 'Jalnan2', sans-serif; font-weight: 400; font-size: 19px; color: var(--ink-soft); }
   .spine .title { font-size: 11.5px; line-height: 1.35; margin-top: 6px; word-break: keep-all; }
   .spine.filled .title { color: var(--ink); font-weight: 600; }
   .spine.empty .title { color: var(--ink-soft); font-style: italic; }
   .spine.lit .band { background: var(--lit); }
   .spine.poem .band { background: var(--poem); }
-  .spine.owned { outline: 2px solid var(--accent); outline-offset: -2px; }
-  .spine .own-mark { position: absolute; top: 6px; right: 6px; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); color: var(--paper); font-size: 10px; display: flex; align-items: center; justify-content: center; }
+  .spine.owned { outline: 2px solid var(--mint); outline-offset: -2px; background: var(--mint-soft); }
+  .spine .own-mark { position: absolute; top: 6px; right: 6px; width: 18px; height: 18px; border-radius: 50%; background: var(--mint); color: var(--paper); font-size: 10px; display: flex; align-items: center; justify-content: center; }
   .spine { position: relative; }
   .mycollect { display: flex; align-items: center; gap: 10px; margin: 14px 0 22px; font-size: 13px; color: var(--ink-soft); }
-  .mycollect-bar { flex: 1; height: 6px; background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; }
-  .mycollect-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s ease; }
-  form.panel { background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 10px; padding: 18px; margin-top: 20px; display: grid; gap: 10px; }
+  .mycollect-bar { flex: 1; height: 8px; background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; }
+  .mycollect-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--poem)); width: 0%; transition: width 0.3s ease; border-radius: 999px; }
+  form.panel { background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 18px; padding: 20px; margin-top: 20px; display: grid; gap: 10px; }
   form.panel .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   form.panel label { font-size: 12.5px; color: var(--ink-soft); display: block; margin-bottom: 4px; }
-  form.panel input, form.panel select, form.panel textarea { width: 100%; font: inherit; font-size: 14px; padding: 9px 10px; border-radius: 6px; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); }
-  .btn { justify-self: start; background: var(--accent); color: var(--paper); border: none; padding: 10px 18px; border-radius: 999px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
-  .btn:hover { opacity: 0.9; }
+  form.panel input, form.panel select, form.panel textarea { width: 100%; font: inherit; font-size: 14px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); }
+  form.panel input:focus, form.panel select:focus, form.panel textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .btn { justify-self: start; background: var(--accent); color: #fff; border: none; padding: 11px 20px; border-radius: 999px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 16px -8px rgba(255,122,147,0.55); }
+  .btn:hover { opacity: 0.92; transform: translateY(-1px); }
   .btn:disabled { opacity: 0.5; cursor: not-allowed; }
   .btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-  .btn.ghost { background: transparent; color: var(--ink-soft); border: 1px solid var(--rule); }
+  .btn.ghost { background: transparent; color: var(--ink-soft); border: 1px solid var(--rule); box-shadow: none; }
   .list { display: grid; gap: 10px; margin-top: 18px; }
-  .card { background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; font-size: 14px; }
+  .card { background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 16px; padding: 14px 16px; font-size: 14px; }
   .card .meta { font-size: 12px; color: var(--ink-soft); margin-top: 6px; font-variant-numeric: tabular-nums; }
-  .tag { display: inline-block; background: var(--accent-soft); color: var(--accent); border-radius: 5px; padding: 2px 8px; font-size: 11.5px; font-weight: 700; margin-right: 6px; }
+  .tag { display: inline-block; background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 3px 10px; font-size: 11.5px; font-weight: 700; margin-right: 6px; }
   .tag.want { background: var(--wine-soft); color: var(--wine); }
-  .stamp-card { background: var(--paper-raised); border: 1px dashed var(--rule); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 14px; font-size: 14px; }
+  .stamp-card { background: var(--paper-raised); border: 1px dashed var(--rule); border-radius: 16px; padding: 12px 16px; display: flex; align-items: center; gap: 14px; font-size: 14px; }
   .stamp { flex: 0 0 auto; width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--brass); color: var(--brass); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; text-align: center; line-height: 1.15; transform: rotate(-8deg); }
   .empty-hint { color: var(--ink-soft); font-size: 13.5px; font-style: italic; }
-  .store-row { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--rule); font-size: 13.5px; }
+  .store-row { display: flex; justify-content: space-between; gap: 10px; padding: 12px 4px; border-bottom: 1px dashed var(--rule); font-size: 13.5px; }
   .store-row:last-child { border-bottom: none; }
-  .store-row a { color: var(--accent); text-decoration: none; font-weight: 600; }
-  .store-name { font-weight: 600; }
+  .store-row a { color: var(--accent); text-decoration: none; font-weight: 700; }
+  .store-name { font-weight: 700; }
   .store-addr { color: var(--ink-soft); font-size: 12.5px; }
-  footer { margin-top: 72px; padding-top: 18px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--ink-soft); }
+  footer { margin-top: 72px; padding-top: 18px; border-top: 1px dashed var(--rule); font-size: 12.5px; color: var(--ink-soft); }
   footer a { color: inherit; }
-  .banner { border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 18px; display: none; }
+  .banner { border-radius: 14px; padding: 10px 14px; font-size: 13px; margin-bottom: 18px; display: none; }
   .banner.warn { background: var(--wine-soft); color: var(--wine); border: 1px solid var(--wine); }
   .authbar { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 14px; font-size: 13px; color: var(--ink-soft); }
   .quicknav { position: sticky; top: 0; z-index: 10; display: flex; gap: 6px; background: var(--paper); padding: 10px 0; margin: -10px 0 20px; border-bottom: 1px solid var(--rule); }
-  .quicknav a { flex: 1; text-align: center; font-size: 12.5px; font-weight: 700; color: var(--ink-soft); text-decoration: none; padding: 8px 4px; border-radius: 999px; background: var(--paper-raised); border: 1px solid var(--rule); }
-  .quicknav a:hover, .quicknav a:focus-visible { color: var(--ink); border-color: var(--accent); }
+  .quicknav a { flex: 1; text-align: center; font-size: 12.5px; font-weight: 700; color: var(--ink-soft); text-decoration: none; padding: 9px 4px; border-radius: 999px; background: var(--paper-raised); border: 1px solid var(--rule); }
+  .quicknav a:hover, .quicknav a:focus-visible { color: var(--accent); border-color: var(--accent); }
   .skeleton { background: linear-gradient(90deg, var(--paper-raised) 25%, var(--rule) 37%, var(--paper-raised) 63%); background-size: 400% 100%; animation: shimmer 1.4s ease infinite; border-radius: 8px; }
   @keyframes shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
   .store-row .dist { font-size: 11.5px; color: var(--accent); font-weight: 700; white-space: nowrap; }
-  .geo-btn { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 700; cursor: pointer; margin-bottom: 12px; }
+  .geo-btn { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 9px 15px; font-size: 13px; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
   .geo-btn:disabled { opacity: 0.5; cursor: default; }
-  .kakao-map { width: 100%; height: 300px; border-radius: 10px; border: 1px solid var(--rule); margin-bottom: 16px; background: var(--paper-raised); }
-  .geo-note { font-size: 11.5px; color: var(--ink-soft); margin: -6px 0 14px; }
-  .authbar .kakao-btn { display: inline-flex; align-items: center; gap: 6px; background: #FEE500; color: #191600; border: none; padding: 7px 14px; border-radius: 999px; font-weight: 700; font-size: 12.5px; cursor: pointer; text-decoration: none; }
+  .kakao-map { width: 100%; height: 300px; border-radius: 18px; border: 1px solid var(--rule); margin-bottom: 16px; background: var(--paper-raised); }
+  .geo-note { font-size: 11.5px; color: var(--ink-soft); margin: -4px 0 14px; }
+  .authbar .kakao-btn { display: inline-flex; align-items: center; gap: 6px; background: #FEE500; color: #191600; border: none; padding: 8px 15px; border-radius: 999px; font-weight: 700; font-size: 12.5px; cursor: pointer; text-decoration: none; }
   .authbar .link-btn { background: none; border: none; color: var(--ink-soft); font-size: 12.5px; text-decoration: underline; cursor: pointer; padding: 0; }
   .del-btn { background: none; border: none; color: var(--ink-soft); font-size: 11.5px; text-decoration: underline; cursor: pointer; padding: 0; margin-left: 8px; }
+  .authbar .avatar { width: 28px; height: 28px; border-radius: 50%; flex: 0 0 auto; }
+  .authbar .inbox-btn { position: relative; background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 999px; padding: 6px 10px; font-size: 15px; cursor: pointer; }
+  .authbar .badge { position: absolute; top: -4px; right: -4px; background: var(--wine); color: #fff; border-radius: 999px; font-size: 10px; min-width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; padding: 0 3px; }
+  .panel-pop { position: fixed; inset: 0; background: rgba(74,51,47,0.35); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .panel-pop-inner { background: var(--paper); border: 1px solid var(--rule); border-radius: 20px; padding: 22px; max-width: 380px; width: 100%; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 40px -20px rgba(0,0,0,0.3); }
+  .panel-pop-inner .row { display: flex; gap: 8px; align-items: flex-end; }
+  .panel-pop-inner label { font-size: 12.5px; color: var(--ink-soft); display: block; margin-bottom: 4px; }
+  .panel-pop-inner input, .panel-pop-inner textarea { width: 100%; font: inherit; font-size: 14px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--rule); background: var(--paper-raised); color: var(--ink); }
+  .avatar-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin: 8px 0 16px; }
+  .avatar-swatch { width: 100%; aspect-ratio: 1; border-radius: 50%; border: 2px solid transparent; cursor: pointer; padding: 0; background: none; }
+  .avatar-swatch.selected { border-color: var(--accent); }
+  .author-row { display: flex; align-items: center; gap: 8px; }
+  .msg-btn { background: none; border: none; color: var(--accent); font-size: 11.5px; font-weight: 700; text-decoration: underline; cursor: pointer; padding: 0; margin-left: 8px; }
+  .inbox-item { border-bottom: 1px dashed var(--rule); padding: 10px 0; font-size: 13px; }
+  .inbox-item:last-child { border-bottom: none; }
   @media (max-width: 480px) { form.panel .row { grid-template-columns: 1fr; } .shelf { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); } }
 </style>
 </head>
@@ -114,6 +145,40 @@
   <div id="error-banner" class="banner warn">지금 서버 연결이 원활하지 않아요. 잠시 후 다시 시도해주세요.</div>
 
   <div class="authbar" id="authbar"></div>
+
+  <div class="panel-pop" id="profile-panel" hidden>
+    <div class="panel-pop-inner">
+      <div class="row">
+        <div>
+          <label for="nickname-input">닉네임</label>
+          <input id="nickname-input" type="text" maxlength="20" />
+        </div>
+        <button type="button" class="btn" id="nickname-save">저장</button>
+      </div>
+      <label style="margin-top:10px; display:block;">아이콘 선택</label>
+      <div class="avatar-grid" id="avatar-grid"></div>
+      <button type="button" class="btn ghost" id="profile-close">닫기</button>
+    </div>
+  </div>
+
+  <div class="panel-pop" id="inbox-panel" hidden>
+    <div class="panel-pop-inner">
+      <div class="sechead" style="margin:0 0 10px; border:none;"><h2 style="font-size:16px;">쪽지함</h2></div>
+      <div class="list" id="inbox-list"></div>
+      <button type="button" class="btn ghost" id="inbox-close">닫기</button>
+    </div>
+  </div>
+
+  <div class="panel-pop" id="compose-panel" hidden>
+    <div class="panel-pop-inner">
+      <div class="sechead" style="margin:0 0 10px; border:none;"><h2 style="font-size:16px;" id="compose-title">쪽지 보내기</h2></div>
+      <textarea id="compose-text" maxlength="300" rows="3" placeholder="메시지를 입력하세요"></textarea>
+      <div style="display:flex; gap:8px; margin-top:10px;">
+        <button type="button" class="btn" id="compose-send">보내기</button>
+        <button type="button" class="btn ghost" id="compose-close">취소</button>
+      </div>
+    </div>
+  </div>
 
   <nav class="quicknav">
     <a href="#sec-checklist">도감</a>
@@ -125,7 +190,7 @@
 
   <p class="kicker">GS25 &times; 민음사 &times; 오늘의 귀여움</p>
   <h1 class="display">민음사 책갈피 도감</h1>
-  <p class="lede">20종 정답은 커뮤니티가 다 찾아냈어요. 이제 남은 건 <b>당신의 컬렉션</b>이에요 — 로그인해서 내가 가진 걸 체크하면, 남는 건 자동으로 교환글에 채워드려요. 근처 매장·입고 소식도 실시간으로 모여요.</p>
+  <p class="lede">20종 정답은 커뮤니티가 다 찾아냈어요. 이제 남은 건 <b>당신의 컬렉션</b>이에요: 로그인해서 내가 가진 걸 체크하면, 남는 건 자동으로 교환글에 채워드려요. 근처 매장/입고 소식도 실시간으로 모여요.</p>
 
   <div class="factrow">
     <span class="chip"><b>1차</b>&nbsp;8.21 출시</span>
@@ -134,7 +199,7 @@
     <span class="chip"><b>깨찰빵</b>&nbsp;2,700원</span>
     <span class="chip warn">점포당 하루 4개 발주 제한</span>
   </div>
-  <p class="secnote" style="margin-top:14px;">중고 시세는 정가의 최대 3배(개당 7천~1만 5천원) 수준으로 거래되고 있어요 — 교환할 때 참고하세요. (출처: <a href="https://www.sisajournal-e.com/news/articleView.html?idxno=423388" style="color:inherit;">시사저널e, 2026.08.28</a>)</p>
+  <p class="secnote" style="margin-top:14px;">중고 시세는 정가의 최대 3배(개당 7천~1만 5천원) 수준으로 거래되고 있어요: 교환할 때 참고하세요. (출처: <a href="https://www.sisajournal-e.com/news/articleView.html?idxno=423388" style="color:inherit;">시사저널e, 2026.08.28</a>)</p>
 
   <section id="sec-checklist">
     <div class="sechead"><h2>책갈피 도감</h2><span class="count" id="checklist-count">0/20 확인됨</span></div>
@@ -147,7 +212,7 @@
     <div class="shelf-group"><div class="shelf-label">시집 (5종)</div><div class="shelf" id="shelf-poem"></div></div>
     <form class="panel" id="form-identify" hidden>
       <div id="identify-target-label" style="font-weight:600;"></div>
-      <div><label for="identify-title">책 제목 (저자도 함께 적어주면 좋아요)</label><input id="identify-title" type="text" maxlength="60" required placeholder="예: 이방인 · 알베르 카뮈" /></div>
+      <div><label for="identify-title">책 제목 (저자도 함께 적어주면 좋아요)</label><input id="identify-title" type="text" maxlength="60" required placeholder="예: 이방인 / 알베르 카뮈" /></div>
       <div><label for="identify-note">메모 (선택)</label><input id="identify-note" type="text" maxlength="80" placeholder="색상, 특징 등" /></div>
       <div style="display:flex; gap:8px;"><button type="submit" class="btn">제보하기</button><button type="button" class="btn ghost" id="identify-cancel">취소</button></div>
     </form>
@@ -161,7 +226,7 @@
 
   <section id="sec-trade">
     <div class="sechead"><h2>교환 게시판</h2><span class="count" id="trade-count">0건</span></div>
-    <p class="secnote">남는 책갈피와 필요한 책갈피를 적어두면 서로 찾을 수 있어요. 번개장터 같은 범용 중고거래와 달리 도감 20종 기준으로 정확히 매칭돼요. 만남·택배는 각자 연락처로 정해주세요.</p>
+    <p class="secnote">남는 책갈피와 필요한 책갈피를 적어두면 서로 찾을 수 있어요. 번개장터 같은 범용 중고거래와 달리 도감 20종 기준으로 정확히 매칭돼요. 만남/택배는 각자 연락처로 정해주세요.</p>
     <form class="panel" id="form-trade">
       <div class="row">
         <div><label for="trade-have">보유 중 <button type="button" class="link-btn" id="fill-have" style="margin-left:4px;">내 컬렉션으로 채우기</button></label><input id="trade-have" type="text" maxlength="60" required placeholder="예: 이방인, 오만과 편견" /></div>
@@ -194,7 +259,7 @@
     <div class="sechead"><h2>매장 찾기</h2><span class="count" id="store-count">0곳</span></div>
     <p class="secnote">서울 GS25 매장 목록이에요 (카카오맵 기준, 밀집 지역은 일부만 표시될 수 있어요). 재고는 매장마다 다르니 참고만 해주세요.</p>
     <button type="button" class="geo-btn" id="geo-btn">📍 내 근처 매장 가까운 순으로 보기</button>
-    <p class="geo-note">위치는 이 기기(브라우저) 안에서만 계산되고 서버로 전송·저장되지 않아요.</p>
+    <p class="geo-note">위치는 이 기기(브라우저) 안에서만 계산되고 서버로 전송/저장되지 않아요.</p>
     <form class="panel" id="form-store-filter" style="grid-template-columns: 1fr 1fr; display:grid;">
       <div><label for="store-gu">지역</label><select id="store-gu"><option value="">전체</option></select></div>
       <div><label for="store-q">매장명 검색</label><input id="store-q" type="text" placeholder="예: 강남, 역삼" /></div>
@@ -203,7 +268,7 @@
     <div class="list" id="store-list"></div>
   </section>
 
-  <footer>이 페이지는 팬이 만든 커뮤니티 페이지로, GS25·민음사 공식 서비스가 아니에요. 모든 정보는 이용자 제보로 채워지며 정확성을 보장하지 않습니다.</footer>
+  <footer>이 페이지는 팬이 만든 커뮤니티 페이지로, GS25/민음사 공식 서비스가 아니에요. 모든 정보는 이용자 제보로 채워지며 정확성을 보장하지 않습니다. / <a href="/privacy.html">개인정보처리방침</a></footer>
 </div>
 
 <script>
@@ -251,19 +316,63 @@
     return r.json();
   }
 
+  var AVATAR_TONES = [
+    { bg: "#ffe3ea", fg: "#ff7a93" },
+    { bg: "#e2f7ee", fg: "#3fae7f" },
+    { bg: "#e8ebfb", fg: "#7386d6" },
+  ];
+  var AVATAR_SHAPES = [
+    '<path d="M11,6 H21 V26 L16,21.5 L11,26 Z" fill="none" stroke="{c}" stroke-width="2.4" stroke-linejoin="round"/>',
+    '<path d="M6,10 C10,8.5 13,8.5 16,9.5 C19,8.5 22,8.5 26,10 V21 C22,19.5 19,19.5 16,20.5 C13,19.5 10,19.5 6,21 Z" fill="none" stroke="{c}" stroke-width="2.2" stroke-linejoin="round"/><line x1="16" y1="9.5" x2="16" y2="20.5" stroke="{c}" stroke-width="1.6"/>',
+    '<path d="M8,24 L22,10 M22,10 L20,9 L21,7 L24,8 L23,11 Z" fill="none" stroke="{c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
+    '<path d="M16,8 C22,10 22,18 16,24 C10,18 10,10 16,8 Z" fill="none" stroke="{c}" stroke-width="2.2" stroke-linejoin="round"/><line x1="16" y1="9" x2="16" y2="23" stroke="{c}" stroke-width="1.4"/>',
+    '<path d="M16,7 L18.3,13 L25,13.3 L19.7,17.3 L21.6,24 L16,20.1 L10.4,24 L12.3,17.3 L7,13.3 L13.7,13 Z" fill="none" stroke="{c}" stroke-width="2" stroke-linejoin="round"/>',
+    '<path d="M16,24 C9,19 7,14.5 9.5,11.3 C11.5,8.8 15,9.3 16,12.5 C17,9.3 20.5,8.8 22.5,11.3 C25,14.5 23,19 16,24 Z" fill="none" stroke="{c}" stroke-width="2.2" stroke-linejoin="round"/>',
+    '<path d="M20,7 C15,7 12,11 12,16 C12,21 16,25 21,24 C17,22.5 14.5,19 14.5,16 C14.5,12 17,8.5 20,7 Z" fill="none" stroke="{c}" stroke-width="2.2" stroke-linejoin="round"/>',
+    '<circle cx="11" cy="16" r="4.2" fill="none" stroke="{c}" stroke-width="2.2"/><circle cx="21" cy="16" r="4.2" fill="none" stroke="{c}" stroke-width="2.2"/><line x1="15.2" y1="16" x2="16.8" y2="16" stroke="{c}" stroke-width="2.2"/>',
+    '<path d="M9,14 H23 C23,20 19.5,23 16,23 C12.5,23 9,20 9,14 Z" fill="none" stroke="{c}" stroke-width="2.2" stroke-linejoin="round"/><path d="M23,15 C26,15 26,19 23,19" fill="none" stroke="{c}" stroke-width="2"/><path d="M13,9 C13,11 15,10.5 15,12.5 M18,9 C18,11 16,10.5 16,12.5" fill="none" stroke="{c}" stroke-width="1.6" stroke-linecap="round"/>',
+    '<rect x="8" y="18" width="16" height="4" rx="1.5" fill="none" stroke="{c}" stroke-width="2"/><rect x="9" y="13" width="14" height="4" rx="1.5" fill="none" stroke="{c}" stroke-width="2"/><rect x="10" y="8" width="12" height="4" rx="1.5" fill="none" stroke="{c}" stroke-width="2"/>',
+  ];
+
+  function avatarSVG(id, size) {
+    size = size || 32;
+    var shapeIdx = Math.floor(id / AVATAR_TONES.length) % AVATAR_SHAPES.length;
+    var toneIdx = id % AVATAR_TONES.length;
+    var tone = AVATAR_TONES[toneIdx];
+    var glyph = AVATAR_SHAPES[shapeIdx].split("{c}").join(tone.fg);
+    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">' +
+      '<circle cx="16" cy="16" r="16" fill="' + tone.bg + '"/>' + glyph + '</svg>';
+  }
+
   function renderAuthbar() {
     var bar = document.getElementById("authbar");
     bar.innerHTML = "";
     if (STATE.me) {
-      var span = document.createElement("span");
-      span.textContent = STATE.me.name + "님";
+      var avatarSpan = document.createElement("span");
+      avatarSpan.className = "avatar";
+      avatarSpan.innerHTML = avatarSVG(STATE.me.avatar, 28);
+      avatarSpan.style.cursor = "pointer";
+      avatarSpan.addEventListener("click", openProfilePanel);
+
+      var nameBtn = document.createElement("button");
+      nameBtn.type = "button"; nameBtn.className = "link-btn";
+      nameBtn.textContent = STATE.me.name + "님";
+      nameBtn.style.textDecoration = "none"; nameBtn.style.fontWeight = "700"; nameBtn.style.color = "var(--ink)";
+      nameBtn.addEventListener("click", openProfilePanel);
+
+      var inboxBtn = document.createElement("button");
+      inboxBtn.type = "button"; inboxBtn.className = "inbox-btn"; inboxBtn.textContent = "✉️";
+      if (STATE.me.unread > 0) {
+        var badge = document.createElement("span"); badge.className = "badge"; badge.textContent = STATE.me.unread;
+        inboxBtn.appendChild(badge);
+      }
+      inboxBtn.addEventListener("click", openInboxPanel);
+
       var logout = document.createElement("a");
-      logout.className = "link-btn";
-      logout.href = "/api/auth/logout";
-      logout.textContent = "로그아웃";
+      logout.className = "link-btn"; logout.href = "/api/auth/logout"; logout.textContent = "로그아웃";
       logout.style.textDecoration = "underline";
-      bar.appendChild(span);
-      bar.appendChild(logout);
+
+      bar.appendChild(avatarSpan); bar.appendChild(nameBtn); bar.appendChild(inboxBtn); bar.appendChild(logout);
     } else {
       var loginBtn = document.createElement("a");
       loginBtn.className = "kakao-btn";
@@ -272,6 +381,83 @@
       bar.appendChild(loginBtn);
     }
   }
+
+  function fillAvatarGrid() {
+    var grid = document.getElementById("avatar-grid");
+    grid.innerHTML = "";
+    var count = (STATE.me && STATE.me.avatarCount) || 30;
+    for (var i = 0; i < count; i++) {
+      (function (idx) {
+        var btn = document.createElement("button");
+        btn.type = "button"; btn.className = "avatar-swatch" + (STATE.me && STATE.me.avatar === idx ? " selected" : "");
+        btn.innerHTML = avatarSVG(idx, 40);
+        btn.addEventListener("click", async function () {
+          try { STATE = await apiPost({ type: "set_avatar", avatar: idx }); renderAuthbar(); fillAvatarGrid(); } catch (e) { showError(); }
+        });
+        grid.appendChild(btn);
+      })(i);
+    }
+  }
+
+  function openProfilePanel() {
+    if (!STATE.me) return;
+    document.getElementById("nickname-input").value = STATE.me.name;
+    fillAvatarGrid();
+    document.getElementById("profile-panel").hidden = false;
+  }
+  document.getElementById("profile-close").addEventListener("click", function () { document.getElementById("profile-panel").hidden = true; });
+  document.getElementById("nickname-save").addEventListener("click", async function () {
+    var v = document.getElementById("nickname-input").value.trim();
+    if (v.length < 2) return;
+    try { STATE = await apiPost({ type: "set_nickname", nickname: v }); renderAuthbar(); } catch (e) { showError(); }
+  });
+
+  async function openInboxPanel() {
+    document.getElementById("inbox-panel").hidden = false;
+    var list = document.getElementById("inbox-list");
+    list.innerHTML = "불러오는 중...";
+    try {
+      var r = await fetch("/api/messages");
+      var data = await r.json();
+      list.innerHTML = "";
+      if (!data.messages || data.messages.length === 0) {
+        list.innerHTML = '<p class="empty-hint">아직 받은 쪽지가 없어요.</p>';
+      } else {
+        data.messages.forEach(function (m) {
+          var item = document.createElement("div"); item.className = "inbox-item";
+          item.innerHTML = '<div class="author-row"><span class="avatar" style="width:22px;height:22px;">' + avatarSVG(m.fromAvatar, 22) + '</span><b>' + m.fromName + '</b></div>' +
+            (m.tradeSummary ? '<div class="meta" style="margin-top:2px;">' + m.tradeSummary + ' 글에 대해</div>' : '') +
+            '<div style="margin-top:4px;">' + m.text.replace(/[<>]/g, "") + '</div>' +
+            '<div class="meta">' + fmtTime(m.ts) + '</div>';
+          list.appendChild(item);
+        });
+      }
+      STATE.me.unread = 0;
+      renderAuthbar();
+    } catch (e) { list.innerHTML = '<p class="empty-hint">불러오지 못했어요.</p>'; }
+  }
+  document.getElementById("inbox-close").addEventListener("click", function () { document.getElementById("inbox-panel").hidden = true; });
+
+  var composeTarget = null;
+  function openComposePanel(toUid, toName, tradeId, tradeSummary) {
+    if (!STATE.me) { window.location.href = "/api/auth/login"; return; }
+    composeTarget = { toUid: toUid, tradeId: tradeId, tradeSummary: tradeSummary };
+    document.getElementById("compose-title").textContent = toName + "님께 쪽지 보내기";
+    document.getElementById("compose-text").value = "";
+    document.getElementById("compose-panel").hidden = false;
+  }
+  document.getElementById("compose-close").addEventListener("click", function () { document.getElementById("compose-panel").hidden = true; });
+  document.getElementById("compose-send").addEventListener("click", async function () {
+    var text = document.getElementById("compose-text").value.trim();
+    if (!text || !composeTarget) return;
+    try {
+      await fetch("/api/messages", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ toUid: composeTarget.toUid, text: text, tradeId: composeTarget.tradeId, tradeSummary: composeTarget.tradeSummary }),
+      });
+      document.getElementById("compose-panel").hidden = true;
+    } catch (e) { showError(); }
+  });
 
   function renderChecklist() {
     var litEl = document.getElementById("shelf-lit");
@@ -352,7 +538,7 @@
     if (!STATE.me) { window.location.href = "/api/auth/login"; return; }
     identifyTargetId = id;
     var item = STATE.checklist.filter(function (i) { return i.id === id; })[0];
-    document.getElementById("identify-target-label").textContent = "#" + id + (item.title ? " · 현재: " + item.title : " · 아직 미확인");
+    document.getElementById("identify-target-label").textContent = "#" + id + (item.title ? " / 현재: " + item.title : " / 아직 미확인");
     document.getElementById("identify-title").value = item.title || "";
     document.getElementById("identify-note").value = item.note || "";
     document.getElementById("form-identify").hidden = false;
@@ -391,11 +577,19 @@
     }
     STATE.trades.slice().reverse().forEach(function (t) {
       var card = document.createElement("div"); card.className = "card";
+      var authorRow = document.createElement("div"); authorRow.className = "author-row";
+      var av = document.createElement("span"); av.className = "avatar"; av.style.width = "22px"; av.style.height = "22px";
+      av.innerHTML = avatarSVG(t.authorAvatar || 0, 22);
+      var nm = document.createElement("b"); nm.style.fontSize = "13px"; nm.textContent = t.authorName || "이용자";
+      authorRow.appendChild(av); authorRow.appendChild(nm);
+      card.appendChild(authorRow);
       var haveTag = document.createElement("span"); haveTag.className = "tag"; haveTag.textContent = "보유 " + t.have;
       var wantTag = document.createElement("span"); wantTag.className = "tag want"; wantTag.textContent = "필요 " + t.want;
-      card.appendChild(haveTag); card.appendChild(wantTag);
+      var tagRow = document.createElement("div"); tagRow.style.marginTop = "8px";
+      tagRow.appendChild(haveTag); tagRow.appendChild(wantTag);
+      card.appendChild(tagRow);
       if (t.note) { var noteDiv = document.createElement("div"); noteDiv.style.marginTop = "8px"; noteDiv.textContent = t.note; card.appendChild(noteDiv); }
-      var meta = document.createElement("div"); meta.className = "meta"; meta.textContent = (t.authorName || "") + " · " + t.gu + " · " + fmtTime(t.ts);
+      var meta = document.createElement("div"); meta.className = "meta"; meta.textContent = t.gu + " / " + fmtTime(t.ts);
       if (STATE.me && t.authorUid === STATE.me.uid) {
         var del = document.createElement("button");
         del.type = "button"; del.className = "del-btn"; del.textContent = "삭제";
@@ -403,6 +597,13 @@
           try { STATE = await apiPost({ type: "delete_trade", id: t.id }); renderTrades(); } catch (err) { showError(); }
         });
         meta.appendChild(del);
+      } else {
+        var msgBtn = document.createElement("button");
+        msgBtn.type = "button"; msgBtn.className = "msg-btn"; msgBtn.textContent = "쪽지 보내기";
+        msgBtn.addEventListener("click", function () {
+          openComposePanel(t.authorUid, t.authorName || "이용자", t.id, "보유:" + t.have + " / 필요:" + t.want);
+        });
+        meta.appendChild(msgBtn);
       }
       card.appendChild(meta); list.appendChild(card);
     });
@@ -451,10 +652,10 @@
       var card = document.createElement("div"); card.className = "stamp-card";
       var stamp = document.createElement("div"); stamp.className = "stamp"; stamp.textContent = r.gu.replace("구", "");
       var body = document.createElement("div");
-      var line1 = document.createElement("div"); line1.style.fontWeight = "600"; line1.textContent = r.gu + " · " + r.time;
+      var line1 = document.createElement("div"); line1.style.fontWeight = "600"; line1.textContent = r.gu + " / " + r.time;
       body.appendChild(line1);
       if (r.note) { var line2 = document.createElement("div"); line2.style.fontSize = "13px"; line2.style.color = "var(--ink-soft)"; line2.textContent = r.note; body.appendChild(line2); }
-      var line3 = document.createElement("div"); line3.className = "meta"; line3.textContent = "제보 " + (r.authorName || "") + " · " + fmtTime(r.ts);
+      var line3 = document.createElement("div"); line3.className = "meta"; line3.textContent = "제보 " + (r.authorName || "") + " / " + fmtTime(r.ts);
       if (STATE.me && r.authorUid === STATE.me.uid) {
         var del = document.createElement("button");
         del.type = "button"; del.className = "del-btn"; del.textContent = "삭제";
