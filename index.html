@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>민음사 책갈피 도감</title>
-<meta name="description" content="민음사빵 책갈피 20종을 함께 채우는 도감, 교환, 입고 제보 커뮤니티. 곧 공개됩니다.">
+<meta name="description" content="민음사빵 책갈피 20종을 함께 채우는 도감, 교환 게시판, 입고 제보, 서울 매장 찾기">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔖</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,57 +12,383 @@
 <style>
   :root {
     --paper: #f1efe4; --paper-raised: #e9e5d5; --ink: #221f19; --ink-soft: #57503f;
-    --rule: #d8d2bd; --accent: #2f4a3d; --brass: #a9822f; --lit: #2b3a55; --poem: #7a2e2e;
+    --rule: #d8d2bd; --accent: #2f4a3d; --accent-soft: #e4ebe6; --wine: #7a2e2e;
+    --wine-soft: #f3e6e3; --brass: #a9822f; --lit: #2b3a55; --poem: #7a2e2e;
+    --shadow: 0 1px 0 rgba(34,31,25,0.06), 0 8px 20px -14px rgba(34,31,25,0.35);
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --paper: #17150f; --paper-raised: #211e17; --ink: #ece7d9; --ink-soft: #b6ae9a;
-      --rule: #39342a; --accent: #86b89f; --brass: #d3ac5c; --lit: #9fb0d1; --poem: #d68f8f;
+      --paper: #191712; --paper-raised: #221f19; --ink: #ece7d9; --ink-soft: #b6ae9a;
+      --rule: #3a352b; --accent: #7fae97; --accent-soft: #23302a; --wine: #d68f8f;
+      --wine-soft: #322220; --brass: #d3ac5c; --lit: #9fb0d1; --poem: #d68f8f;
+      --shadow: 0 1px 0 rgba(0,0,0,0.4), 0 8px 24px -14px rgba(0,0,0,0.6);
     }
   }
   :root[data-theme="dark"] {
-    --paper: #17150f; --paper-raised: #211e17; --ink: #ece7d9; --ink-soft: #b6ae9a;
-    --rule: #39342a; --accent: #86b89f; --brass: #d3ac5c; --lit: #9fb0d1; --poem: #d68f8f;
+    --paper: #191712; --paper-raised: #221f19; --ink: #ece7d9; --ink-soft: #b6ae9a;
+    --rule: #3a352b; --accent: #7fae97; --accent-soft: #23302a; --wine: #d68f8f;
+    --wine-soft: #322220; --brass: #d3ac5c; --lit: #9fb0d1; --poem: #d68f8f;
+    --shadow: 0 1px 0 rgba(0,0,0,0.4), 0 8px 24px -14px rgba(0,0,0,0.6);
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; }
-  .stage { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 56px 20px; }
-  .wrap { max-width: 460px; width: 100%; text-align: center; }
-  .kicker { font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--brass); font-weight: 700; margin: 0 0 14px; opacity: 0; animation: rise 0.6s 0.05s ease forwards; }
-  h1 { font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: clamp(30px, 8vw, 44px); line-height: 1.2; margin: 0 0 16px; text-wrap: balance; opacity: 0; animation: rise 0.7s 0.15s ease forwards; }
-  .lede { font-size: 15.5px; color: var(--ink-soft); margin: 0 auto 30px; max-width: 38ch; opacity: 0; animation: rise 0.7s 0.28s ease forwards; }
-  .shelf { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; max-width: 400px; margin: 0 auto 34px; opacity: 0; animation: rise 0.8s 0.4s ease forwards; }
-  .spine { aspect-ratio: 3/4; border-radius: 4px; background: var(--paper-raised); border: 1px solid var(--rule); display: flex; align-items: center; justify-content: center; }
-  .spine .band { width: 10px; height: 3px; border-radius: 2px; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 48px 20px 96px; }
+  .display { font-family: 'Nanum Myeongjo', serif; text-wrap: balance; }
+  h1.display { font-size: clamp(28px, 6vw, 40px); font-weight: 800; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .kicker { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass); font-weight: 600; margin: 0 0 10px; }
+  .lede { color: var(--ink-soft); font-size: 15.5px; margin: 0 0 22px; max-width: 58ch; }
+  .factrow { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 999px; padding: 6px 12px; font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .chip b { color: var(--ink); font-weight: 700; }
+  .chip.warn { border-color: var(--wine); color: var(--wine); background: var(--wine-soft); }
+  section { margin-top: 56px; }
+  .sechead { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 4px; border-bottom: 2px solid var(--ink); padding-bottom: 10px; }
+  .sechead h2 { font-family: 'Nanum Myeongjo', serif; font-size: 22px; font-weight: 700; margin: 0; }
+  .sechead .count { font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .secnote { color: var(--ink-soft); font-size: 13.5px; margin: 10px 0 20px; }
+  .shelf-group { margin-top: 22px; }
+  .shelf-label { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; margin-bottom: 10px; }
+  .shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 10px; }
+  .spine { background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 6px; padding: 12px 8px 10px; min-height: 118px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; cursor: pointer; text-align: center; box-shadow: var(--shadow); transition: transform 0.12s ease; font: inherit; color: inherit; width: 100%; }
+  .spine:hover { transform: translateY(-2px); }
+  .spine:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .spine .band { width: 22px; height: 5px; border-radius: 3px; margin-bottom: 8px; }
+  .spine .num { font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: 20px; color: var(--ink-soft); }
+  .spine .title { font-size: 11.5px; line-height: 1.35; margin-top: 6px; word-break: keep-all; }
+  .spine.filled .title { color: var(--ink); font-weight: 600; }
+  .spine.empty .title { color: var(--ink-soft); font-style: italic; }
   .spine.lit .band { background: var(--lit); }
   .spine.poem .band { background: var(--poem); }
-  .status { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--ink-soft); opacity: 0; animation: rise 0.7s 0.55s ease forwards; }
-  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulse 1.6s ease-in-out infinite; }
-  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
-  @media (prefers-reduced-motion: reduce) { * { animation: none !important; opacity: 1 !important; } }
+  form.panel { background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 10px; padding: 18px; margin-top: 20px; display: grid; gap: 10px; }
+  form.panel .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  form.panel label { font-size: 12.5px; color: var(--ink-soft); display: block; margin-bottom: 4px; }
+  form.panel input, form.panel select, form.panel textarea { width: 100%; font: inherit; font-size: 14px; padding: 9px 10px; border-radius: 6px; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); }
+  .btn { justify-self: start; background: var(--accent); color: var(--paper); border: none; padding: 10px 18px; border-radius: 999px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .btn:hover { opacity: 0.9; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .btn.ghost { background: transparent; color: var(--ink-soft); border: 1px solid var(--rule); }
+  .list { display: grid; gap: 10px; margin-top: 18px; }
+  .card { background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; font-size: 14px; }
+  .card .meta { font-size: 12px; color: var(--ink-soft); margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .tag { display: inline-block; background: var(--accent-soft); color: var(--accent); border-radius: 5px; padding: 2px 8px; font-size: 11.5px; font-weight: 700; margin-right: 6px; }
+  .tag.want { background: var(--wine-soft); color: var(--wine); }
+  .stamp-card { background: var(--paper-raised); border: 1px dashed var(--rule); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 14px; font-size: 14px; }
+  .stamp { flex: 0 0 auto; width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--brass); color: var(--brass); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; text-align: center; line-height: 1.15; transform: rotate(-8deg); }
+  .empty-hint { color: var(--ink-soft); font-size: 13.5px; font-style: italic; }
+  .store-row { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--rule); font-size: 13.5px; }
+  .store-row:last-child { border-bottom: none; }
+  .store-row a { color: var(--accent); text-decoration: none; font-weight: 600; }
+  .store-name { font-weight: 600; }
+  .store-addr { color: var(--ink-soft); font-size: 12.5px; }
+  footer { margin-top: 72px; padding-top: 18px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--ink-soft); }
+  footer a { color: inherit; }
+  .banner { border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 18px; display: none; }
+  .banner.warn { background: var(--wine-soft); color: var(--wine); border: 1px solid var(--wine); }
+  @media (max-width: 480px) { form.panel .row { grid-template-columns: 1fr; } .shelf { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); } }
 </style>
 </head>
 <body>
-  <div class="stage">
-    <div class="wrap">
-      <p class="kicker">서울 · 텍스트힙 커뮤니티</p>
-      <h1>민음사 책갈피 도감,<br>준비 중이에요</h1>
-      <p class="lede">20종을 함께 채우고, 남는 건 바꾸고, 입고 소식도 나누는 곳. 잠시만 기다려주세요!</p>
-      <div class="shelf" id="shelf"></div>
-      <div class="status"><span class="dot"></span> 곧 열립니다</div>
-    </div>
+<div class="wrap">
+  <div id="error-banner" class="banner warn">지금 서버 연결이 원활하지 않아요. 잠시 후 다시 시도해주세요.</div>
+
+  <p class="kicker">GS25 &times; 민음사 &times; 오늘의 귀여움</p>
+  <h1 class="display">민음사 책갈피 도감</h1>
+  <p class="lede">민음사빵 속에 무작위로 들어있는 책갈피 20종을 함께 채워가는 도감이에요. 어떤 책갈피를 얻었는지 알려주고, 남는 걸 필요한 사람과 바꾸고, 근처 매장·입고 소식도 나눠요. 서울 위주로 시작합니다.</p>
+
+  <div class="factrow">
+    <span class="chip"><b>1차</b>&nbsp;8.21 출시</span>
+    <span class="chip"><b>2차</b>&nbsp;8.26 출시</span>
+    <span class="chip"><b>모카번</b>&nbsp;3,700원</span>
+    <span class="chip"><b>깨찰빵</b>&nbsp;2,700원</span>
+    <span class="chip warn">점포당 하루 4개 발주 제한</span>
   </div>
-  <script>
-    var shelf = document.getElementById("shelf");
-    for (var i = 1; i <= 20; i++) {
-      var s = document.createElement("div");
-      s.className = "spine " + (i <= 15 ? "lit" : "poem");
-      var band = document.createElement("div");
-      band.className = "band";
-      s.appendChild(band);
-      shelf.appendChild(s);
+  <p class="secnote" style="margin-top:14px;">중고 시세는 정가의 최대 3배(개당 7천~1만 5천원) 수준으로 거래되고 있어요 — 교환할 때 참고하세요. (출처: <a href="https://www.sisajournal-e.com/news/articleView.html?idxno=423388" style="color:inherit;">시사저널e, 2026.08.28</a>)</p>
+
+  <section id="sec-checklist">
+    <div class="sechead"><h2>책갈피 도감</h2><span class="count" id="checklist-count">0/20 확인됨</span></div>
+    <p class="secnote">공식 명단이 따로 없어서, 실제로 뽑은 분들이 알려주는 대로 채워가고 있어요. 번호를 눌러서 어떤 책갈피였는지 제보해주세요.</p>
+    <div class="shelf-group"><div class="shelf-label">세계문학전집 (15종)</div><div class="shelf" id="shelf-lit"></div></div>
+    <div class="shelf-group"><div class="shelf-label">시집 (5종)</div><div class="shelf" id="shelf-poem"></div></div>
+    <form class="panel" id="form-identify" hidden>
+      <div id="identify-target-label" style="font-weight:600;"></div>
+      <div><label for="identify-title">책 제목 (저자도 함께 적어주면 좋아요)</label><input id="identify-title" type="text" maxlength="60" required placeholder="예: 이방인 · 알베르 카뮈" /></div>
+      <div><label for="identify-note">메모 (선택)</label><input id="identify-note" type="text" maxlength="80" placeholder="색상, 특징 등" /></div>
+      <div style="display:flex; gap:8px;"><button type="submit" class="btn">제보하기</button><button type="button" class="btn ghost" id="identify-cancel">취소</button></div>
+    </form>
+  </section>
+
+  <section id="sec-trade">
+    <div class="sechead"><h2>교환 게시판</h2><span class="count" id="trade-count">0건</span></div>
+    <p class="secnote">남는 책갈피와 필요한 책갈피를 적어두면 서로 찾을 수 있어요. 만남·택배는 각자 채팅으로 정해주세요.</p>
+    <form class="panel" id="form-trade">
+      <div class="row">
+        <div><label for="trade-have">보유 중</label><input id="trade-have" type="text" maxlength="60" required placeholder="예: 이방인, 오만과 편견" /></div>
+        <div><label for="trade-want">필요함</label><input id="trade-want" type="text" maxlength="60" required placeholder="예: 시집 5종 중 아무거나" /></div>
+      </div>
+      <div class="row">
+        <div><label for="trade-gu">지역 (서울)</label><select id="trade-gu" required></select></div>
+        <div><label for="trade-note">연락 방법 / 메모</label><input id="trade-note" type="text" maxlength="80" placeholder="예: 오픈채팅 링크, 댓글로 연락 등" /></div>
+      </div>
+      <button type="submit" class="btn">교환 글 올리기</button>
+    </form>
+    <div class="list" id="trade-list"></div>
+  </section>
+
+  <section id="sec-restock">
+    <div class="sechead"><h2>입고 제보</h2><span class="count" id="restock-count">0건</span></div>
+    <p class="secnote">방금 입고된 걸 봤다면 남겨주세요. 하루 4개 제한이라 금방 사라지니, 시간이 좀 지난 제보는 참고만 해주세요.</p>
+    <form class="panel" id="form-restock">
+      <div class="row">
+        <div><label for="restock-gu">지역 (서울)</label><select id="restock-gu" required></select></div>
+        <div><label for="restock-time">시간</label><input id="restock-time" type="text" maxlength="30" required placeholder="예: 오전 7시경" /></div>
+      </div>
+      <div><label for="restock-note">메모 (선택)</label><input id="restock-note" type="text" maxlength="80" placeholder="매장 근처 특징, 몇 종 남았는지 등" /></div>
+      <button type="submit" class="btn">제보하기</button>
+    </form>
+    <div class="list" id="restock-list"></div>
+  </section>
+
+  <section id="sec-stores">
+    <div class="sechead"><h2>매장 찾기</h2><span class="count" id="store-count">0곳</span></div>
+    <p class="secnote">서울 GS25 매장 목록이에요 (카카오맵 기준, 밀집 지역은 일부만 표시될 수 있어요). 재고는 매장마다 다르니 참고만 해주세요.</p>
+    <form class="panel" id="form-store-filter" style="grid-template-columns: 1fr 1fr; display:grid;">
+      <div><label for="store-gu">지역</label><select id="store-gu"><option value="">전체</option></select></div>
+      <div><label for="store-q">매장명 검색</label><input id="store-q" type="text" placeholder="예: 강남, 역삼" /></div>
+    </form>
+    <div class="list" id="store-list"></div>
+  </section>
+
+  <footer>이 페이지는 팬이 만든 커뮤니티 페이지로, GS25·민음사 공식 서비스가 아니에요. 모든 정보는 이용자 제보로 채워지며 정확성을 보장하지 않습니다.</footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var GU_LIST = ["종로구","중구","용산구","성동구","광진구","동대문구","중랑구","성북구","강북구","도봉구","노원구","은평구","서대문구","마포구","양천구","강서구","구로구","금천구","영등포구","동작구","관악구","서초구","강남구","송파구","강동구"];
+
+  var STATE = { checklist: [], trades: [], restocks: [] };
+  var STORES = [];
+  var canWrite = true;
+
+  function fmtTime(ts) {
+    var d = new Date(ts);
+    var mo = d.getMonth() + 1, da = d.getDate();
+    var hh = d.getHours(), mm = d.getMinutes();
+    var ampm = hh < 12 ? "오전" : "오후";
+    var h12 = hh % 12; if (h12 === 0) h12 = 12;
+    var mmStr = mm < 10 ? "0" + mm : "" + mm;
+    return mo + "." + da + " " + ampm + " " + h12 + ":" + mmStr;
+  }
+
+  function showError(msg) {
+    var b = document.getElementById("error-banner");
+    b.style.display = "block";
+  }
+
+  async function apiGet() {
+    var r = await fetch("/api/state");
+    if (!r.ok) throw new Error("get_failed");
+    return r.json();
+  }
+
+  async function apiPost(payload) {
+    var r = await fetch("/api/state", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!r.ok) throw new Error("post_failed");
+    return r.json();
+  }
+
+  function renderChecklist() {
+    var litEl = document.getElementById("shelf-lit");
+    var poemEl = document.getElementById("shelf-poem");
+    litEl.innerHTML = ""; poemEl.innerHTML = "";
+    var confirmed = 0;
+    STATE.checklist.forEach(function (item) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "spine " + item.category + " " + (item.title ? "filled" : "empty");
+      var band = document.createElement("div"); band.className = "band";
+      var num = document.createElement("div"); num.className = "num"; num.textContent = item.id;
+      var title = document.createElement("div"); title.className = "title"; title.textContent = item.title ? item.title : "미확인";
+      btn.appendChild(band); btn.appendChild(num); btn.appendChild(title);
+      btn.addEventListener("click", function () { openIdentify(item.id); });
+      if (item.title) confirmed++;
+      (item.category === "lit" ? litEl : poemEl).appendChild(btn);
+    });
+    document.getElementById("checklist-count").textContent = confirmed + "/20 확인됨";
+  }
+
+  var identifyTargetId = null;
+  function openIdentify(id) {
+    if (!canWrite) return;
+    identifyTargetId = id;
+    var item = STATE.checklist.filter(function (i) { return i.id === id; })[0];
+    document.getElementById("identify-target-label").textContent = "#" + id + (item.title ? " · 현재: " + item.title : " · 아직 미확인");
+    document.getElementById("identify-title").value = item.title || "";
+    document.getElementById("identify-note").value = item.note || "";
+    document.getElementById("form-identify").hidden = false;
+    document.getElementById("identify-title").focus();
+  }
+
+  document.getElementById("identify-cancel").addEventListener("click", function () {
+    document.getElementById("form-identify").hidden = true;
+    identifyTargetId = null;
+  });
+
+  document.getElementById("form-identify").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    if (identifyTargetId == null) return;
+    var title = document.getElementById("identify-title").value.trim();
+    var note = document.getElementById("identify-note").value.trim();
+    if (!title) return;
+    try {
+      STATE = await apiPost({ type: "identify", id: identifyTargetId, title: title, note: note });
+      document.getElementById("form-identify").hidden = true;
+      identifyTargetId = null;
+      renderChecklist();
+    } catch (err) { showError(); }
+  });
+
+  function renderTrades() {
+    var list = document.getElementById("trade-list");
+    list.innerHTML = "";
+    document.getElementById("trade-count").textContent = STATE.trades.length + "건";
+    if (STATE.trades.length === 0) {
+      var p = document.createElement("p"); p.className = "empty-hint"; p.textContent = "아직 등록된 교환 글이 없어요. 첫 글을 올려보세요.";
+      list.appendChild(p); return;
     }
-  </script>
+    STATE.trades.slice().reverse().forEach(function (t) {
+      var card = document.createElement("div"); card.className = "card";
+      var haveTag = document.createElement("span"); haveTag.className = "tag"; haveTag.textContent = "보유 " + t.have;
+      var wantTag = document.createElement("span"); wantTag.className = "tag want"; wantTag.textContent = "필요 " + t.want;
+      card.appendChild(haveTag); card.appendChild(wantTag);
+      if (t.note) { var noteDiv = document.createElement("div"); noteDiv.style.marginTop = "8px"; noteDiv.textContent = t.note; card.appendChild(noteDiv); }
+      var meta = document.createElement("div"); meta.className = "meta"; meta.textContent = t.gu + " · " + fmtTime(t.ts);
+      card.appendChild(meta); list.appendChild(card);
+    });
+  }
+
+  document.getElementById("form-trade").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    if (!canWrite) return;
+    var have = document.getElementById("trade-have").value.trim();
+    var want = document.getElementById("trade-want").value.trim();
+    var gu = document.getElementById("trade-gu").value;
+    var note = document.getElementById("trade-note").value.trim();
+    if (!have || !want) return;
+    try {
+      STATE = await apiPost({ type: "trade", have: have, want: want, gu: gu, note: note });
+      e.target.reset(); document.getElementById("trade-gu").value = gu;
+      renderTrades();
+    } catch (err) { showError(); }
+  });
+
+  function renderRestocks() {
+    var list = document.getElementById("restock-list");
+    list.innerHTML = "";
+    document.getElementById("restock-count").textContent = STATE.restocks.length + "건";
+    if (STATE.restocks.length === 0) {
+      var p = document.createElement("p"); p.className = "empty-hint"; p.textContent = "아직 제보가 없어요. 첫 제보를 남겨보세요.";
+      list.appendChild(p); return;
+    }
+    STATE.restocks.slice().reverse().forEach(function (r) {
+      var card = document.createElement("div"); card.className = "stamp-card";
+      var stamp = document.createElement("div"); stamp.className = "stamp"; stamp.textContent = r.gu.replace("구", "");
+      var body = document.createElement("div");
+      var line1 = document.createElement("div"); line1.style.fontWeight = "600"; line1.textContent = r.gu + " · " + r.time;
+      body.appendChild(line1);
+      if (r.note) { var line2 = document.createElement("div"); line2.style.fontSize = "13px"; line2.style.color = "var(--ink-soft)"; line2.textContent = r.note; body.appendChild(line2); }
+      var line3 = document.createElement("div"); line3.className = "meta"; line3.textContent = "제보 " + fmtTime(r.ts);
+      body.appendChild(line3);
+      card.appendChild(stamp); card.appendChild(body); list.appendChild(card);
+    });
+  }
+
+  document.getElementById("form-restock").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    if (!canWrite) return;
+    var gu = document.getElementById("restock-gu").value;
+    var time = document.getElementById("restock-time").value.trim();
+    var note = document.getElementById("restock-note").value.trim();
+    if (!time) return;
+    try {
+      STATE = await apiPost({ type: "restock", gu: gu, time: time, note: note });
+      e.target.reset(); document.getElementById("restock-gu").value = gu;
+      renderRestocks();
+    } catch (err) { showError(); }
+  });
+
+  function renderStores() {
+    var guFilter = document.getElementById("store-gu").value;
+    var q = document.getElementById("store-q").value.trim().toLowerCase();
+    var filtered = STORES.filter(function (s) {
+      if (guFilter && s.gu !== guFilter) return false;
+      if (q && s.name.toLowerCase().indexOf(q) === -1 && s.address.toLowerCase().indexOf(q) === -1) return false;
+      return true;
+    }).slice(0, 60);
+    document.getElementById("store-count").textContent = STORES.length + "곳 (표시 " + filtered.length + ")";
+    var list = document.getElementById("store-list");
+    list.innerHTML = "";
+    if (filtered.length === 0) {
+      var p = document.createElement("p"); p.className = "empty-hint"; p.textContent = "조건에 맞는 매장이 없어요.";
+      list.appendChild(p); return;
+    }
+    filtered.forEach(function (s) {
+      var row = document.createElement("div"); row.className = "store-row";
+      var left = document.createElement("div");
+      var name = document.createElement("div"); name.className = "store-name"; name.textContent = s.name;
+      var addr = document.createElement("div"); addr.className = "store-addr"; addr.textContent = s.address;
+      left.appendChild(name); left.appendChild(addr);
+      var link = document.createElement("a");
+      link.href = "https://map.kakao.com/link/map/" + encodeURIComponent(s.name) + "," + s.lat + "," + s.lng;
+      link.target = "_blank"; link.rel = "noopener"; link.textContent = "지도";
+      row.appendChild(left); row.appendChild(link);
+      list.appendChild(row);
+    });
+  }
+
+  document.getElementById("store-gu").addEventListener("change", renderStores);
+  document.getElementById("store-q").addEventListener("input", renderStores);
+
+  function fillGuSelects() {
+    ["trade-gu", "restock-gu", "store-gu"].forEach(function (id) {
+      var sel = document.getElementById(id);
+      GU_LIST.forEach(function (gu) {
+        var opt = document.createElement("option"); opt.value = gu; opt.textContent = gu; sel.appendChild(opt);
+      });
+    });
+  }
+
+  function setReadOnly() {
+    canWrite = false;
+    document.querySelectorAll(".btn[type=submit]").forEach(function (b) { b.disabled = true; });
+  }
+
+  (async function init() {
+    fillGuSelects();
+    try {
+      var storeRes = await fetch("/data/gs25_seoul.json");
+      STORES = await storeRes.json();
+    } catch (e) { STORES = []; }
+    renderStores();
+
+    try {
+      STATE = await apiGet();
+    } catch (err) {
+      showError();
+      setReadOnly();
+      STATE = { checklist: [], trades: [], restocks: [] };
+    }
+    renderChecklist();
+    renderTrades();
+    renderRestocks();
+  })();
+})();
+</script>
 </body>
 </html>
