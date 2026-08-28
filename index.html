@@ -66,7 +66,7 @@
   .shelf-group { margin-top: 22px; }
   .shelf-label { font-size: 12px; letter-spacing: 0.06em; color: var(--ink-soft); font-weight: 700; margin-bottom: 10px; }
   .shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 10px; }
-  .spine { background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 16px; padding: 12px 8px 10px; min-height: 118px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; cursor: pointer; text-align: center; box-shadow: var(--shadow); transition: transform 0.15s ease; font: inherit; color: inherit; width: 100%; }
+  .spine { background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 16px; padding: 12px 8px 10px; min-height: 118px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; cursor: pointer; text-align: center; box-shadow: var(--shadow); transition: transform 0.15s ease, background-color 0.12s ease, outline-color 0.12s ease; font: inherit; color: inherit; width: 100%; }
   .spine:hover { transform: translateY(-3px) rotate(-1deg); }
   .spine:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .spine .band { width: 24px; height: 6px; border-radius: 999px; margin-bottom: 8px; }
@@ -527,14 +527,31 @@
     }
   }
 
+  var togglePending = {};
   async function toggleOwn(id) {
+    if (togglePending[id]) return;
+    togglePending[id] = true;
+
+    STATE.myOwned = STATE.myOwned || [];
+    var idx = STATE.myOwned.indexOf(id);
+    var wasOwned = idx !== -1;
+    if (wasOwned) { STATE.myOwned.splice(idx, 1); } else { STATE.myOwned.push(id); }
+    renderChecklist();
+
     try {
-      STATE = await apiPost({ type: "toggle_own", id: id });
+      var freshState = await apiPost({ type: "toggle_own", id: id });
+      STATE = freshState;
       renderChecklist();
       renderLeaderboard();
     } catch (err) {
+      if (wasOwned) { STATE.myOwned.push(id); } else {
+        var i2 = STATE.myOwned.indexOf(id); if (i2 !== -1) STATE.myOwned.splice(i2, 1);
+      }
+      renderChecklist();
       if (err.code === "login_required") { window.location.href = "/api/auth/login"; return; }
       showError();
+    } finally {
+      delete togglePending[id];
     }
   }
 
