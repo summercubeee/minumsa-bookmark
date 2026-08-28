@@ -59,6 +59,12 @@
   .spine.empty .title { color: var(--ink-soft); font-style: italic; }
   .spine.lit .band { background: var(--lit); }
   .spine.poem .band { background: var(--poem); }
+  .spine.owned { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .spine .own-mark { position: absolute; top: 6px; right: 6px; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); color: var(--paper); font-size: 10px; display: flex; align-items: center; justify-content: center; }
+  .spine { position: relative; }
+  .mycollect { display: flex; align-items: center; gap: 10px; margin: 14px 0 22px; font-size: 13px; color: var(--ink-soft); }
+  .mycollect-bar { flex: 1; height: 6px; background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; }
+  .mycollect-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s ease; }
   form.panel { background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 10px; padding: 18px; margin-top: 20px; display: grid; gap: 10px; }
   form.panel .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   form.panel label { font-size: 12.5px; color: var(--ink-soft); display: block; margin-bottom: 4px; }
@@ -100,7 +106,7 @@
 
   <p class="kicker">GS25 &times; 민음사 &times; 오늘의 귀여움</p>
   <h1 class="display">민음사 책갈피 도감</h1>
-  <p class="lede">민음사빵 속에 무작위로 들어있는 책갈피 20종을 함께 채워가는 도감이에요. 어떤 책갈피를 얻었는지 알려주고, 남는 걸 필요한 사람과 바꾸고, 근처 매장·입고 소식도 나눠요. 서울 위주로 시작합니다.</p>
+  <p class="lede">20종 정답은 커뮤니티가 다 찾아냈어요. 이제 남은 건 <b>당신의 컬렉션</b>이에요 — 로그인해서 내가 가진 걸 체크하면, 남는 건 자동으로 교환글에 채워드려요. 근처 매장·입고 소식도 실시간으로 모여요.</p>
 
   <div class="factrow">
     <span class="chip"><b>1차</b>&nbsp;8.21 출시</span>
@@ -113,7 +119,11 @@
 
   <section id="sec-checklist">
     <div class="sechead"><h2>책갈피 도감</h2><span class="count" id="checklist-count">0/20 확인됨</span></div>
-    <p class="secnote">공식 명단이 따로 없어서, 실제로 뽑은 분들이 알려주는 대로 채워가고 있어요. 번호를 눌러서 어떤 책갈피였는지 제보해주세요.</p>
+    <p class="secnote">공식 명단이 따로 없어서, 실제로 뽑은 분들이 알려주는 대로 채워가고 있어요. 번호를 누르면 제목 제보 또는 내 컬렉션 체크를 할 수 있어요.</p>
+    <div class="mycollect" id="mycollect" hidden>
+      <div class="mycollect-bar"><div class="mycollect-fill" id="mycollect-fill"></div></div>
+      <span id="mycollect-label">내 컬렉션 0/20</span>
+    </div>
     <div class="shelf-group"><div class="shelf-label">세계문학전집 (15종)</div><div class="shelf" id="shelf-lit"></div></div>
     <div class="shelf-group"><div class="shelf-label">시집 (5종)</div><div class="shelf" id="shelf-poem"></div></div>
     <form class="panel" id="form-identify" hidden>
@@ -126,11 +136,11 @@
 
   <section id="sec-trade">
     <div class="sechead"><h2>교환 게시판</h2><span class="count" id="trade-count">0건</span></div>
-    <p class="secnote">남는 책갈피와 필요한 책갈피를 적어두면 서로 찾을 수 있어요. 만남·택배는 각자 채팅으로 정해주세요.</p>
+    <p class="secnote">남는 책갈피와 필요한 책갈피를 적어두면 서로 찾을 수 있어요. 번개장터 같은 범용 중고거래와 달리 도감 20종 기준으로 정확히 매칭돼요. 만남·택배는 각자 연락처로 정해주세요.</p>
     <form class="panel" id="form-trade">
       <div class="row">
-        <div><label for="trade-have">보유 중</label><input id="trade-have" type="text" maxlength="60" required placeholder="예: 이방인, 오만과 편견" /></div>
-        <div><label for="trade-want">필요함</label><input id="trade-want" type="text" maxlength="60" required placeholder="예: 시집 5종 중 아무거나" /></div>
+        <div><label for="trade-have">보유 중 <button type="button" class="link-btn" id="fill-have" style="margin-left:4px;">내 컬렉션으로 채우기</button></label><input id="trade-have" type="text" maxlength="60" required placeholder="예: 이방인, 오만과 편견" /></div>
+        <div><label for="trade-want">필요함 <button type="button" class="link-btn" id="fill-want" style="margin-left:4px;">안 가진 것 자동 채우기</button></label><input id="trade-want" type="text" maxlength="60" required placeholder="예: 시집 5종 중 아무거나" /></div>
       </div>
       <div class="row">
         <div><label for="trade-gu">지역 (서울)</label><select id="trade-gu" required></select></div>
@@ -240,19 +250,51 @@
     var poemEl = document.getElementById("shelf-poem");
     litEl.innerHTML = ""; poemEl.innerHTML = "";
     var confirmed = 0;
+    var owned = (STATE.myOwned || []);
     STATE.checklist.forEach(function (item) {
+      var isOwned = owned.indexOf(item.id) !== -1;
       var btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "spine " + item.category + " " + (item.title ? "filled" : "empty");
+      btn.className = "spine " + item.category + " " + (item.title ? "filled" : "empty") + (isOwned ? " owned" : "");
       var band = document.createElement("div"); band.className = "band";
       var num = document.createElement("div"); num.className = "num"; num.textContent = item.id;
       var title = document.createElement("div"); title.className = "title"; title.textContent = item.title ? item.title : "미확인";
       btn.appendChild(band); btn.appendChild(num); btn.appendChild(title);
-      btn.addEventListener("click", function () { openIdentify(item.id); });
+      if (isOwned) {
+        var mark = document.createElement("div"); mark.className = "own-mark"; mark.textContent = "✓";
+        btn.appendChild(mark);
+      }
+      btn.title = item.title
+        ? (STATE.me ? "탭: 내 컬렉션 " + (isOwned ? "해제" : "체크") : "로그인하면 내 컬렉션에 체크할 수 있어요")
+        : "탭: 어떤 책갈피인지 제보";
+      btn.addEventListener("click", function () {
+        if (!STATE.me) { window.location.href = "/api/auth/login"; return; }
+        if (item.title) { toggleOwn(item.id); } else { openIdentify(item.id); }
+      });
       if (item.title) confirmed++;
       (item.category === "lit" ? litEl : poemEl).appendChild(btn);
     });
     document.getElementById("checklist-count").textContent = confirmed + "/20 확인됨";
+
+    var mc = document.getElementById("mycollect");
+    if (STATE.me) {
+      mc.hidden = false;
+      var pct = Math.round((owned.length / 20) * 100);
+      document.getElementById("mycollect-fill").style.width = pct + "%";
+      document.getElementById("mycollect-label").textContent = "내 컬렉션 " + owned.length + "/20";
+    } else {
+      mc.hidden = true;
+    }
+  }
+
+  async function toggleOwn(id) {
+    try {
+      STATE = await apiPost({ type: "toggle_own", id: id });
+      renderChecklist();
+    } catch (err) {
+      if (err.code === "login_required") { window.location.href = "/api/auth/login"; return; }
+      showError();
+    }
   }
 
   var identifyTargetId = null;
@@ -315,6 +357,20 @@
       card.appendChild(meta); list.appendChild(card);
     });
   }
+
+  document.getElementById("fill-have").addEventListener("click", function () {
+    if (!STATE.me) { window.location.href = "/api/auth/login"; return; }
+    var owned = (STATE.myOwned || []);
+    var titles = STATE.checklist.filter(function (i) { return owned.indexOf(i.id) !== -1 && i.title; }).map(function (i) { return i.title; });
+    document.getElementById("trade-have").value = titles.join(", ") || "아직 체크한 컬렉션이 없어요";
+  });
+
+  document.getElementById("fill-want").addEventListener("click", function () {
+    if (!STATE.me) { window.location.href = "/api/auth/login"; return; }
+    var owned = (STATE.myOwned || []);
+    var titles = STATE.checklist.filter(function (i) { return owned.indexOf(i.id) === -1 && i.title; }).map(function (i) { return i.title; });
+    document.getElementById("trade-want").value = titles.join(", ") || "다 갖고 계세요!";
+  });
 
   document.getElementById("form-trade").addEventListener("submit", async function (e) {
     e.preventDefault();

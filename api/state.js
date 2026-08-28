@@ -25,11 +25,12 @@ function parseHash(hash) {
     .sort((a, b) => a.ts - b.ts);
 }
 
-async function getState() {
-  const [checklistRaw, tradesRaw, restocksRaw] = await Promise.all([
+async function getState(uid) {
+  const [checklistRaw, tradesRaw, restocksRaw, owned] = await Promise.all([
     redis.hgetall("checklist"),
     redis.hgetall("trades"),
     redis.hgetall("restocks"),
+    uid ? redis.smembers(`owned:${uid}`) : Promise.resolve([]),
   ]);
 
   const checklist = [];
@@ -46,7 +47,9 @@ async function getState() {
     checklist.push({ id, category: CATEGORY_BY_ID[id], title, note });
   }
 
-  return { checklist, trades: parseHash(tradesRaw), restocks: parseHash(restocksRaw) };
+  const myOwned = (owned || []).map(Number).filter((n) => Number.isInteger(n));
+
+  return { checklist, trades: parseHash(tradesRaw), restocks: parseHash(restocksRaw), myOwned };
 }
 
 module.exports = async (req, res) => {
@@ -54,8 +57,8 @@ module.exports = async (req, res) => {
 
   if (req.method === "GET") {
     try {
-      const state = await getState();
       const session = getSession(req);
+      const state = await getState(session && session.uid);
       state.me = session ? { uid: session.uid, name: session.name } : null;
       res.status(200).json(state);
     } catch (err) {
@@ -129,12 +132,25 @@ module.exports = async (req, res) => {
           return;
         }
         await redis.hdel(key, id);
+      } else if (type === "toggle_own") {
+        const id = Number(body.id);
+        if (!Number.isInteger(id) || id < 1 || id > 20) {
+          res.status(400).json({ error: "invalid_id" });
+          return;
+        }
+        const key = `owned:${session.uid}`;
+        const isOwned = await redis.sismember(key, id);
+        if (isOwned) {
+          await redis.srem(key, id);
+        } else {
+          await redis.sadd(key, id);
+        }
       } else {
         res.status(400).json({ error: "unknown_type" });
         return;
       }
 
-      const state = await getState();
+      const state = await getState(session.uid);
       state.me = { uid: session.uid, name: session.name };
       res.status(200).json(state);
     } catch (err) {
