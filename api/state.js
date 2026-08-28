@@ -73,9 +73,9 @@ async function getState(uid) {
 async function withMe(state, uid, knownProfile) {
   const [profile, unread] = await Promise.all([
     knownProfile ? Promise.resolve(knownProfile) : getProfile(redis, uid),
-    redis.llen(`inbox:${uid}`).catch(() => 0),
+    redis.get(`unread:${uid}`).catch(() => 0),
   ]);
-  state.me = { uid, name: profile.nickname, avatar: profile.avatar, avatarCount: AVATAR_COUNT, unread: unread || 0 };
+  state.me = { uid, name: profile.nickname, avatar: profile.avatar, avatarCount: AVATAR_COUNT, unread: Number(unread) || 0 };
   return state;
 }
 

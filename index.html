@@ -427,10 +427,25 @@
       } else {
         data.messages.forEach(function (m) {
           var item = document.createElement("div"); item.className = "inbox-item";
-          item.innerHTML = '<div class="author-row"><span class="avatar" style="width:22px;height:22px;">' + avatarSVG(m.fromAvatar, 22) + '</span><b>' + m.fromName + '</b></div>' +
-            (m.tradeSummary ? '<div class="meta" style="margin-top:2px;">' + m.tradeSummary + ' 글에 대해</div>' : '') +
-            '<div style="margin-top:4px;">' + m.text.replace(/[<>]/g, "") + '</div>' +
-            '<div class="meta">' + fmtTime(m.ts) + '</div>';
+          var head = document.createElement("div"); head.className = "author-row";
+          head.innerHTML = '<span class="avatar" style="width:22px;height:22px;">' + avatarSVG(m.fromAvatar, 22) + '</span><b>' + m.fromName + '</b>';
+          item.appendChild(head);
+          if (m.tradeSummary) {
+            var tr = document.createElement("div"); tr.className = "meta"; tr.style.marginTop = "2px"; tr.textContent = m.tradeSummary + " 글에 대해";
+            item.appendChild(tr);
+          }
+          var body = document.createElement("div"); body.style.marginTop = "4px"; body.textContent = m.text;
+          item.appendChild(body);
+          var footRow = document.createElement("div"); footRow.className = "meta";
+          footRow.textContent = fmtTime(m.ts);
+          var replyBtn = document.createElement("button");
+          replyBtn.type = "button"; replyBtn.className = "msg-btn"; replyBtn.textContent = "답장";
+          replyBtn.addEventListener("click", function () {
+            document.getElementById("inbox-panel").hidden = true;
+            openComposePanel(m.fromUid, m.fromName, m.tradeId, m.tradeSummary);
+          });
+          footRow.appendChild(replyBtn);
+          item.appendChild(footRow);
           list.appendChild(item);
         });
       }
@@ -452,13 +467,22 @@
   document.getElementById("compose-send").addEventListener("click", async function () {
     var text = document.getElementById("compose-text").value.trim();
     if (!text || !composeTarget) return;
+    var btn = document.getElementById("compose-send");
+    btn.disabled = true; btn.textContent = "보내는 중...";
     try {
-      await fetch("/api/messages", {
+      var r = await fetch("/api/messages", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ toUid: composeTarget.toUid, text: text, tradeId: composeTarget.tradeId, tradeSummary: composeTarget.tradeSummary }),
       });
+      if (r.status === 401) { window.location.href = "/api/auth/login"; return; }
+      if (!r.ok) { throw new Error("send_failed"); }
       document.getElementById("compose-panel").hidden = true;
-    } catch (e) { showError(); }
+      composeTarget = null;
+    } catch (e) {
+      showError();
+    } finally {
+      btn.disabled = false; btn.textContent = "보내기";
+    }
   });
 
   function renderChecklist() {
