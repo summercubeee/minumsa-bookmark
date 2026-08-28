@@ -9,11 +9,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=98457af62383630861d01942fe5c8018&autoload=false"></script>
+<link rel="preload" as="font" href="/assets/fonts/Jalnan2.woff2" type="font/woff2" crossorigin>
+<script defer src="//dapi.kakao.com/v2/maps/sdk.js?appkey=98457af62383630861d01942fe5c8018&autoload=false"></script>
 <style>
   @font-face {
     font-family: 'Jalnan2';
-    src: url('/assets/fonts/Jalnan2TTF.ttf') format('truetype');
+    src: url('/assets/fonts/Jalnan2.woff2') format('woff2');
     font-weight: 400 800;
     font-display: swap;
   }
@@ -732,7 +733,11 @@
       renderStores();
     });
   }
-  initKakaoMap();
+  if (typeof kakao !== "undefined" && kakao.maps) {
+    initKakaoMap();
+  } else {
+    window.addEventListener("load", initKakaoMap);
+  }
 
   function updateMapMarkers(stores) {
     if (!mapReady || !kakaoMap) return;

@@ -70,9 +70,11 @@ async function getState(uid) {
   return { checklist, trades: parseHash(tradesRaw), restocks: parseHash(restocksRaw), myOwned, leaderboard };
 }
 
-async function withMe(state, uid) {
-  const profile = await getProfile(redis, uid);
-  const unread = await redis.llen(`inbox:${uid}`).catch(() => 0);
+async function withMe(state, uid, knownProfile) {
+  const [profile, unread] = await Promise.all([
+    knownProfile ? Promise.resolve(knownProfile) : getProfile(redis, uid),
+    redis.llen(`inbox:${uid}`).catch(() => 0),
+  ]);
   state.me = { uid, name: profile.nickname, avatar: profile.avatar, avatarCount: AVATAR_COUNT, unread: unread || 0 };
   return state;
 }
@@ -209,8 +211,9 @@ module.exports = async (req, res) => {
         return;
       }
 
+      const profileChanged = type === "set_nickname" || type === "set_avatar";
       const state = await getState(session.uid);
-      await withMe(state, session.uid);
+      await withMe(state, session.uid, profileChanged ? null : profile);
       res.status(200).json(state);
     } catch (err) {
       res.status(500).json({ error: "server_error" });
