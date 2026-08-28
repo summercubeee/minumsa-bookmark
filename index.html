@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>민음사 책갈피 도감</title>
+<meta name="description" content="민음사빵 책갈피 20종을 함께 채우는 도감, 교환, 입고 제보 커뮤니티. 곧 공개됩니다.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔖</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f1efe4; --paper-raised: #e9e5d5; --ink: #221f19; --ink-soft: #57503f;
+    --rule: #d8d2bd; --accent: #2f4a3d; --brass: #a9822f; --lit: #2b3a55; --poem: #7a2e2e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #17150f; --paper-raised: #211e17; --ink: #ece7d9; --ink-soft: #b6ae9a;
+      --rule: #39342a; --accent: #86b89f; --brass: #d3ac5c; --lit: #9fb0d1; --poem: #d68f8f;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #17150f; --paper-raised: #211e17; --ink: #ece7d9; --ink-soft: #b6ae9a;
+    --rule: #39342a; --accent: #86b89f; --brass: #d3ac5c; --lit: #9fb0d1; --poem: #d68f8f;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; }
+  .stage { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 56px 20px; }
+  .wrap { max-width: 460px; width: 100%; text-align: center; }
+  .kicker { font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--brass); font-weight: 700; margin: 0 0 14px; opacity: 0; animation: rise 0.6s 0.05s ease forwards; }
+  h1 { font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: clamp(30px, 8vw, 44px); line-height: 1.2; margin: 0 0 16px; text-wrap: balance; opacity: 0; animation: rise 0.7s 0.15s ease forwards; }
+  .lede { font-size: 15.5px; color: var(--ink-soft); margin: 0 auto 30px; max-width: 38ch; opacity: 0; animation: rise 0.7s 0.28s ease forwards; }
+  .shelf { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; max-width: 400px; margin: 0 auto 34px; opacity: 0; animation: rise 0.8s 0.4s ease forwards; }
+  .spine { aspect-ratio: 3/4; border-radius: 4px; background: var(--paper-raised); border: 1px solid var(--rule); display: flex; align-items: center; justify-content: center; }
+  .spine .band { width: 10px; height: 3px; border-radius: 2px; }
+  .spine.lit .band { background: var(--lit); }
+  .spine.poem .band { background: var(--poem); }
+  .status { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--ink-soft); opacity: 0; animation: rise 0.7s 0.55s ease forwards; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; opacity: 1 !important; } }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="wrap">
+      <p class="kicker">서울 · 텍스트힙 커뮤니티</p>
+      <h1>민음사 책갈피 도감,<br>준비 중이에요</h1>
+      <p class="lede">20종을 함께 채우고, 남는 건 바꾸고, 입고 소식도 나누는 곳. 잠시만 기다려주세요!</p>
+      <div class="shelf" id="shelf"></div>
+      <div class="status"><span class="dot"></span> 곧 열립니다</div>
+    </div>
+  </div>
+  <script>
+    var shelf = document.getElementById("shelf");
+    for (var i = 1; i <= 20; i++) {
+      var s = document.createElement("div");
+      s.className = "spine " + (i <= 15 ? "lit" : "poem");
+      var band = document.createElement("div");
+      band.className = "band";
+      s.appendChild(band);
+      shelf.appendChild(s);
+    }
+  </script>
+</body>
+</html>
