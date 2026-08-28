@@ -145,8 +145,11 @@
   .avatar-swatch.selected { border-color: var(--accent); }
   .author-row { display: flex; align-items: center; gap: 8px; }
   .msg-btn { background: none; border: none; color: var(--accent); font-size: 11.5px; font-weight: 700; text-decoration: underline; cursor: pointer; padding: 0; margin-left: 8px; }
-  .inbox-item { border-bottom: 1px dashed var(--rule); padding: 10px 0; font-size: 13px; }
+  .inbox-item { border-bottom: 1px dashed var(--rule); padding: 12px 0; font-size: 13px; }
   .inbox-item:last-child { border-bottom: none; }
+  .inbox-context { font-size: 11.5px; color: var(--ink-soft); margin: 4px 0 6px; line-height: 1.4; }
+  .inbox-bubble { background: var(--paper-raised); border-radius: 14px; padding: 10px 13px; font-size: 14px; color: var(--ink); line-height: 1.5; white-space: pre-wrap; }
+  .inbox-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
   @media (max-width: 480px) { form.panel .row { grid-template-columns: 1fr; } .shelf { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); } }
 </style>
 </head>
@@ -275,7 +278,6 @@
       <div><label for="store-q">매장명 검색</label><input id="store-q" type="text" placeholder="예: 강남, 역삼" /></div>
     </form>
     <div id="kakao-map" class="kakao-map"></div>
-    <div class="list" id="store-list"></div>
   </section>
 
   <footer>이 페이지는 팬이 만든 커뮤니티 페이지로, GS25/민음사 공식 서비스가 아니에요. 모든 정보는 이용자 제보로 채워지며 정확성을 보장하지 않습니다. / <a href="/privacy.html">개인정보처리방침</a></footer>
@@ -436,23 +438,26 @@
         data.messages.forEach(function (m) {
           var item = document.createElement("div"); item.className = "inbox-item";
           var head = document.createElement("div"); head.className = "author-row";
-          head.innerHTML = '<span class="avatar" style="width:22px;height:22px;">' + avatarSVG(m.fromAvatar, 22) + '</span><b>' + m.fromName + '</b>';
+          var av = document.createElement("span"); av.className = "avatar"; av.style.width = "22px"; av.style.height = "22px";
+          av.innerHTML = avatarSVG(m.fromAvatar, 22);
+          var nm = document.createElement("b"); nm.textContent = m.fromName;
+          head.appendChild(av); head.appendChild(nm);
           item.appendChild(head);
           if (m.tradeSummary) {
-            var tr = document.createElement("div"); tr.className = "meta"; tr.style.marginTop = "2px"; tr.textContent = m.tradeSummary + " 글에 대해";
+            var tr = document.createElement("div"); tr.className = "inbox-context"; tr.textContent = "관련 교환글: " + m.tradeSummary;
             item.appendChild(tr);
           }
-          var body = document.createElement("div"); body.style.marginTop = "4px"; body.textContent = m.text;
-          item.appendChild(body);
-          var footRow = document.createElement("div"); footRow.className = "meta";
-          footRow.textContent = fmtTime(m.ts);
+          var bubble = document.createElement("div"); bubble.className = "inbox-bubble"; bubble.textContent = m.text;
+          item.appendChild(bubble);
+          var footRow = document.createElement("div"); footRow.className = "inbox-foot";
+          var timeSpan = document.createElement("span"); timeSpan.className = "meta"; timeSpan.textContent = fmtTime(m.ts);
           var replyBtn = document.createElement("button");
-          replyBtn.type = "button"; replyBtn.className = "msg-btn"; replyBtn.textContent = "답장";
+          replyBtn.type = "button"; replyBtn.className = "del-btn"; replyBtn.textContent = "답장하기";
           replyBtn.addEventListener("click", function () {
             document.getElementById("inbox-panel").hidden = true;
             openComposePanel(m.fromUid, m.fromName, m.tradeId, m.tradeSummary);
           });
-          footRow.appendChild(replyBtn);
+          footRow.appendChild(timeSpan); footRow.appendChild(replyBtn);
           item.appendChild(footRow);
           list.appendChild(item);
         });
@@ -801,7 +806,15 @@
     stores.slice(0, 40).forEach(function (s) {
       var pos = new kakao.maps.LatLng(parseFloat(s.lat), parseFloat(s.lng));
       var marker = new kakao.maps.Marker({ position: pos, map: kakaoMap, title: s.name });
-      var info = new kakao.maps.InfoWindow({ content: '<div style="padding:6px 10px;font-size:12px;white-space:nowrap;">' + s.name + '</div>' });
+      var kakaoUrl = "https://map.kakao.com/link/map/" + encodeURIComponent(s.name) + "," + s.lat + "," + s.lng;
+      var naverUrl = "https://map.naver.com/p/search/" + encodeURIComponent(s.name + " " + s.address);
+      var infoHtml = '<div style="padding:10px 12px;font-size:12.5px;max-width:200px;line-height:1.5;">' +
+        '<div style="font-weight:700;margin-bottom:2px;">' + s.name + '</div>' +
+        '<div style="color:#888;margin-bottom:6px;">' + s.address + '</div>' +
+        '<a href="' + kakaoUrl + '" target="_blank" rel="noopener" style="color:#ff7a93;font-weight:700;text-decoration:none;">카카오지도에서 보기</a><br>' +
+        '<a href="' + naverUrl + '" target="_blank" rel="noopener" style="color:#3fae7f;font-weight:700;text-decoration:none;">네이버지도에서 보기</a>' +
+        '</div>';
+      var info = new kakao.maps.InfoWindow({ content: infoHtml });
       kakao.maps.event.addListener(marker, "click", function () { info.open(kakaoMap, marker); });
       mapMarkers.push(marker);
       bounds.extend(pos);
@@ -827,33 +840,7 @@
     }
     filtered = filtered.slice(0, 60);
     updateMapMarkers(filtered);
-    document.getElementById("store-count").textContent = STORES.length + "곳 (표시 " + filtered.length + ")";
-    var list = document.getElementById("store-list");
-    list.innerHTML = "";
-    if (filtered.length === 0) {
-      var p = document.createElement("p"); p.className = "empty-hint"; p.textContent = "조건에 맞는 매장이 없어요.";
-      list.appendChild(p); return;
-    }
-    filtered.forEach(function (s) {
-      var row = document.createElement("div"); row.className = "store-row";
-      var left = document.createElement("div");
-      var name = document.createElement("div"); name.className = "store-name"; name.textContent = s.name;
-      var addr = document.createElement("div"); addr.className = "store-addr"; addr.textContent = s.address;
-      left.appendChild(name); left.appendChild(addr);
-      var right = document.createElement("div");
-      right.style.display = "flex"; right.style.flexDirection = "column"; right.style.alignItems = "flex-end"; right.style.gap = "4px";
-      if (s._dist != null) {
-        var dist = document.createElement("span"); dist.className = "dist";
-        dist.textContent = s._dist < 1 ? Math.round(s._dist * 1000) + "m" : s._dist.toFixed(1) + "km";
-        right.appendChild(dist);
-      }
-      var link = document.createElement("a");
-      link.href = "https://map.kakao.com/link/map/" + encodeURIComponent(s.name) + "," + s.lat + "," + s.lng;
-      link.target = "_blank"; link.rel = "noopener"; link.textContent = "지도";
-      right.appendChild(link);
-      row.appendChild(left); row.appendChild(right);
-      list.appendChild(row);
-    });
+    document.getElementById("store-count").textContent = STORES.length + "곳 (표시 " + filtered.length + ") / 지도 마커를 눌러 상세 정보를 확인하세요";
   }
 
   document.getElementById("store-gu").addEventListener("change", renderStores);
