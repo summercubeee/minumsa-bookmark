@@ -25,12 +25,24 @@ function parseHash(hash) {
     .sort((a, b) => a.ts - b.ts);
 }
 
+async function getLeaderboard() {
+  const raw = await redis.zrange("leaderboard", 0, 9, { rev: true, withScores: true });
+  const entries = [];
+  for (let i = 0; i < raw.length; i += 2) {
+    entries.push({ uid: raw[i], count: Number(raw[i + 1]) });
+  }
+  if (entries.length === 0) return [];
+  const names = await redis.hmget("user_names", ...entries.map((e) => e.uid));
+  return entries.map((e) => ({ name: (names && names[e.uid]) || "이용자", count: e.count }));
+}
+
 async function getState(uid) {
-  const [checklistRaw, tradesRaw, restocksRaw, owned] = await Promise.all([
+  const [checklistRaw, tradesRaw, restocksRaw, owned, leaderboard] = await Promise.all([
     redis.hgetall("checklist"),
     redis.hgetall("trades"),
     redis.hgetall("restocks"),
     uid ? redis.smembers(`owned:${uid}`) : Promise.resolve([]),
+    getLeaderboard(),
   ]);
 
   const checklist = [];
@@ -49,7 +61,7 @@ async function getState(uid) {
 
   const myOwned = (owned || []).map(Number).filter((n) => Number.isInteger(n));
 
-  return { checklist, trades: parseHash(tradesRaw), restocks: parseHash(restocksRaw), myOwned };
+  return { checklist, trades: parseHash(tradesRaw), restocks: parseHash(restocksRaw), myOwned, leaderboard };
 }
 
 module.exports = async (req, res) => {
@@ -145,6 +157,11 @@ module.exports = async (req, res) => {
         } else {
           await redis.sadd(key, id);
         }
+        const newCount = await redis.scard(key);
+        await Promise.all([
+          redis.zadd("leaderboard", { score: newCount, member: session.uid }),
+          redis.hset("user_names", { [session.uid]: session.name }),
+        ]);
       } else {
         res.status(400).json({ error: "unknown_type" });
         return;

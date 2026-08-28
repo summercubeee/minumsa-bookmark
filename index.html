@@ -92,6 +92,14 @@
   .banner { border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 18px; display: none; }
   .banner.warn { background: var(--wine-soft); color: var(--wine); border: 1px solid var(--wine); }
   .authbar { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 14px; font-size: 13px; color: var(--ink-soft); }
+  .quicknav { position: sticky; top: 0; z-index: 10; display: flex; gap: 6px; background: var(--paper); padding: 10px 0; margin: -10px 0 20px; border-bottom: 1px solid var(--rule); }
+  .quicknav a { flex: 1; text-align: center; font-size: 12.5px; font-weight: 700; color: var(--ink-soft); text-decoration: none; padding: 8px 4px; border-radius: 999px; background: var(--paper-raised); border: 1px solid var(--rule); }
+  .quicknav a:hover, .quicknav a:focus-visible { color: var(--ink); border-color: var(--accent); }
+  .skeleton { background: linear-gradient(90deg, var(--paper-raised) 25%, var(--rule) 37%, var(--paper-raised) 63%); background-size: 400% 100%; animation: shimmer 1.4s ease infinite; border-radius: 8px; }
+  @keyframes shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+  .store-row .dist { font-size: 11.5px; color: var(--accent); font-weight: 700; white-space: nowrap; }
+  .geo-btn { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 700; cursor: pointer; margin-bottom: 12px; }
+  .geo-btn:disabled { opacity: 0.5; cursor: default; }
   .authbar .kakao-btn { display: inline-flex; align-items: center; gap: 6px; background: #FEE500; color: #191600; border: none; padding: 7px 14px; border-radius: 999px; font-weight: 700; font-size: 12.5px; cursor: pointer; text-decoration: none; }
   .authbar .link-btn { background: none; border: none; color: var(--ink-soft); font-size: 12.5px; text-decoration: underline; cursor: pointer; padding: 0; }
   .del-btn { background: none; border: none; color: var(--ink-soft); font-size: 11.5px; text-decoration: underline; cursor: pointer; padding: 0; margin-left: 8px; }
@@ -103,6 +111,14 @@
   <div id="error-banner" class="banner warn">지금 서버 연결이 원활하지 않아요. 잠시 후 다시 시도해주세요.</div>
 
   <div class="authbar" id="authbar"></div>
+
+  <nav class="quicknav">
+    <a href="#sec-checklist">도감</a>
+    <a href="#sec-rank">랭킹</a>
+    <a href="#sec-trade">교환</a>
+    <a href="#sec-stores">매장</a>
+    <a href="#sec-restock">입고</a>
+  </nav>
 
   <p class="kicker">GS25 &times; 민음사 &times; 오늘의 귀여움</p>
   <h1 class="display">민음사 책갈피 도감</h1>
@@ -132,6 +148,12 @@
       <div><label for="identify-note">메모 (선택)</label><input id="identify-note" type="text" maxlength="80" placeholder="색상, 특징 등" /></div>
       <div style="display:flex; gap:8px;"><button type="submit" class="btn">제보하기</button><button type="button" class="btn ghost" id="identify-cancel">취소</button></div>
     </form>
+  </section>
+
+  <section id="sec-rank">
+    <div class="sechead"><h2>수집 랭킹</h2><span class="count" id="rank-count"></span></div>
+    <p class="secnote">사진 인증 없이, 각자 도감에서 체크한 컬렉션 개수로만 매기는 랭킹이에요.</p>
+    <div class="list" id="rank-list"></div>
   </section>
 
   <section id="sec-trade">
@@ -168,6 +190,7 @@
   <section id="sec-stores">
     <div class="sechead"><h2>매장 찾기</h2><span class="count" id="store-count">0곳</span></div>
     <p class="secnote">서울 GS25 매장 목록이에요 (카카오맵 기준, 밀집 지역은 일부만 표시될 수 있어요). 재고는 매장마다 다르니 참고만 해주세요.</p>
+    <button type="button" class="geo-btn" id="geo-btn">📍 내 근처 매장 가까운 순으로 보기</button>
     <form class="panel" id="form-store-filter" style="grid-template-columns: 1fr 1fr; display:grid;">
       <div><label for="store-gu">지역</label><select id="store-gu"><option value="">전체</option></select></div>
       <div><label for="store-q">매장명 검색</label><input id="store-q" type="text" placeholder="예: 강남, 역삼" /></div>
@@ -184,7 +207,7 @@
 
   var GU_LIST = ["종로구","중구","용산구","성동구","광진구","동대문구","중랑구","성북구","강북구","도봉구","노원구","은평구","서대문구","마포구","양천구","강서구","구로구","금천구","영등포구","동작구","관악구","서초구","강남구","송파구","강동구"];
 
-  var STATE = { checklist: [], trades: [], restocks: [] };
+  var STATE = { checklist: [], trades: [], restocks: [], leaderboard: [] };
   var STORES = [];
 
   function fmtTime(ts) {
@@ -291,10 +314,32 @@
     try {
       STATE = await apiPost({ type: "toggle_own", id: id });
       renderChecklist();
+      renderLeaderboard();
     } catch (err) {
       if (err.code === "login_required") { window.location.href = "/api/auth/login"; return; }
       showError();
     }
+  }
+
+  function renderLeaderboard() {
+    var list = document.getElementById("rank-list");
+    var board = STATE.leaderboard || [];
+    document.getElementById("rank-count").textContent = board.length > 0 ? "TOP " + board.length : "";
+    list.innerHTML = "";
+    if (board.length === 0) {
+      var p = document.createElement("p"); p.className = "empty-hint"; p.textContent = "아직 컬렉션을 체크한 사람이 없어요. 첫 번째로 도전해보세요.";
+      list.appendChild(p); return;
+    }
+    var medals = ["🥇", "🥈", "🥉"];
+    board.forEach(function (r, i) {
+      var card = document.createElement("div"); card.className = "card";
+      card.style.display = "flex"; card.style.justifyContent = "space-between"; card.style.alignItems = "center";
+      var left = document.createElement("span");
+      left.textContent = (medals[i] || (i + 1) + "위") + "  " + r.name;
+      var right = document.createElement("span"); right.className = "tag"; right.textContent = r.count + "/20";
+      card.appendChild(left); card.appendChild(right);
+      list.appendChild(card);
+    });
   }
 
   var identifyTargetId = null;
@@ -434,6 +479,36 @@
     }
   });
 
+  var myGeo = null;
+
+  function haversine(lat1, lng1, lat2, lng2) {
+    var R = 6371;
+    var dLat = (lat2 - lat1) * Math.PI / 180;
+    var dLng = (lng2 - lng1) * Math.PI / 180;
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  document.getElementById("geo-btn").addEventListener("click", function () {
+    var btn = document.getElementById("geo-btn");
+    if (!navigator.geolocation) { btn.textContent = "이 브라우저는 위치 기능을 지원하지 않아요"; return; }
+    btn.disabled = true; btn.textContent = "위치 확인 중...";
+    navigator.geolocation.getCurrentPosition(
+      function (pos) {
+        myGeo = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        btn.textContent = "📍 내 근처 매장 가까운 순으로 보기 (적용됨)";
+        btn.disabled = false;
+        renderStores();
+      },
+      function () {
+        btn.textContent = "위치 권한이 없어서 가까운 순 정렬을 못 했어요";
+        btn.disabled = false;
+      }
+    );
+  });
+
   function renderStores() {
     var guFilter = document.getElementById("store-gu").value;
     var q = document.getElementById("store-q").value.trim().toLowerCase();
@@ -441,7 +516,13 @@
       if (guFilter && s.gu !== guFilter) return false;
       if (q && s.name.toLowerCase().indexOf(q) === -1 && s.address.toLowerCase().indexOf(q) === -1) return false;
       return true;
-    }).slice(0, 60);
+    });
+    if (myGeo) {
+      filtered = filtered.map(function (s) {
+        return Object.assign({}, s, { _dist: haversine(myGeo.lat, myGeo.lng, parseFloat(s.lat), parseFloat(s.lng)) });
+      }).sort(function (a, b) { return a._dist - b._dist; });
+    }
+    filtered = filtered.slice(0, 60);
     document.getElementById("store-count").textContent = STORES.length + "곳 (표시 " + filtered.length + ")";
     var list = document.getElementById("store-list");
     list.innerHTML = "";
@@ -455,10 +536,18 @@
       var name = document.createElement("div"); name.className = "store-name"; name.textContent = s.name;
       var addr = document.createElement("div"); addr.className = "store-addr"; addr.textContent = s.address;
       left.appendChild(name); left.appendChild(addr);
+      var right = document.createElement("div");
+      right.style.display = "flex"; right.style.flexDirection = "column"; right.style.alignItems = "flex-end"; right.style.gap = "4px";
+      if (s._dist != null) {
+        var dist = document.createElement("span"); dist.className = "dist";
+        dist.textContent = s._dist < 1 ? Math.round(s._dist * 1000) + "m" : s._dist.toFixed(1) + "km";
+        right.appendChild(dist);
+      }
       var link = document.createElement("a");
       link.href = "https://map.kakao.com/link/map/" + encodeURIComponent(s.name) + "," + s.lat + "," + s.lng;
       link.target = "_blank"; link.rel = "noopener"; link.textContent = "지도";
-      row.appendChild(left); row.appendChild(link);
+      right.appendChild(link);
+      row.appendChild(left); row.appendChild(right);
       list.appendChild(row);
     });
   }
@@ -492,10 +581,11 @@
     } catch (err) {
       showError();
       setReadOnly();
-      STATE = { checklist: [], trades: [], restocks: [], me: null };
+      STATE = { checklist: [], trades: [], restocks: [], leaderboard: [], me: null };
     }
     renderAuthbar();
     renderChecklist();
+    renderLeaderboard();
     renderTrades();
     renderRestocks();
   })();
