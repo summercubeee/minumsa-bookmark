@@ -57,12 +57,19 @@
     --paper-glass: rgba(36,26,29,0.68); --raised-glass: rgba(52,37,42,0.55);
     --shadow: 0 2px 0 rgba(0,0,0,0.3), 0 14px 26px -18px rgba(0,0,0,0.6);
   }
+  :root { --daypart-glow: var(--accent-soft); --daypart-accent: var(--accent); }
+  :root[data-daypart="dawn"] { --daypart-glow: #dde4f7; --daypart-accent: #8fa3e0; }
+  :root[data-daypart="morning"] { --daypart-glow: #e8f6de; --daypart-accent: #7ec98f; }
+  :root[data-daypart="afternoon"] { --daypart-glow: #fff1c2; --daypart-accent: #f0a63e; }
+  :root[data-daypart="evening"] { --daypart-glow: #ffd9c2; --daypart-accent: #ff8f6b; }
+  :root[data-daypart="night"] { --daypart-glow: #ded8f5; --daypart-accent: #9081d6; }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Gowun Dodum', 'Noto Sans KR', 'Malgun Gothic', sans-serif; line-height: 1.65; -webkit-font-smoothing: antialiased; }
   .wrap { max-width: 760px; margin: 0 auto; padding: 48px 20px 96px; position: relative; }
   .wrap::before {
     content: ""; position: absolute; top: -60px; right: -80px; width: 280px; height: 280px;
-    background: radial-gradient(circle, var(--accent-soft) 0%, transparent 72%);
+    background: radial-gradient(circle, var(--daypart-glow) 0%, transparent 72%);
+    transition: background 0.6s ease;
     border-radius: 50%; z-index: -1; pointer-events: none;
   }
   .display { font-family: 'Jalnan2', 'Gowun Dodum', sans-serif; text-wrap: balance; }
@@ -93,7 +100,8 @@
   .spine.lit .band { background: var(--lit); }
   .spine.poem .band { background: var(--poem); }
   .spine.owned { outline: 2px solid var(--mint); outline-offset: -2px; background: var(--mint-soft); }
-  .spine .own-mark { position: absolute; top: 6px; right: 6px; width: 18px; height: 18px; border-radius: 50%; background: var(--mint); color: var(--paper); font-size: 10px; display: flex; align-items: center; justify-content: center; }
+  .spine .own-mark { position: absolute; top: 6px; right: 6px; width: 18px; height: 18px; border-radius: 50%; background: var(--mint); color: var(--paper); font-size: 10px; display: flex; align-items: center; justify-content: center; animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .spine .own-mark svg { width: 11px; height: 11px; }
   .spine { position: relative; }
   .mycollect { display: flex; align-items: center; gap: 10px; margin: 14px 0 22px; font-size: 13px; color: var(--ink-soft); }
   .mycollect-bar { flex: 1; height: 8px; background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; }
@@ -120,7 +128,8 @@
   .trade-items { font-size: 13.5px; color: var(--ink); line-height: 1.55; }
   .stamp-card { background: var(--paper-raised); border: 1px dashed var(--rule); border-radius: 16px; padding: 12px 16px; display: flex; align-items: center; gap: 14px; font-size: 14px; }
   .stamp { flex: 0 0 auto; width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--brass); color: var(--brass); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; text-align: center; line-height: 1.15; transform: rotate(-8deg); }
-  .empty-hint { color: var(--ink-soft); font-size: 13.5px; font-style: italic; }
+  .empty-hint { color: var(--ink-soft); font-size: 13.5px; font-style: italic; display: flex; align-items: center; gap: 6px; }
+  .empty-hint .ico-heart { width: 14px; height: 14px; color: var(--poem); flex: 0 0 auto; }
   .store-row { display: flex; justify-content: space-between; gap: 10px; padding: 12px 4px; border-bottom: 1px dashed var(--rule); font-size: 13.5px; }
   .store-row:last-child { border-bottom: none; }
   .store-row a { color: var(--accent); text-decoration: none; font-weight: 700; }
@@ -192,10 +201,101 @@
   .confetti-layer { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; }
   .confetti-piece { position: absolute; top: -12px; width: 8px; height: 14px; border-radius: 2px; opacity: 0.9; animation-name: confetti-fall; animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94); animation-fill-mode: forwards; }
   @keyframes confetti-fall { to { transform: translateY(420px) rotate(340deg); opacity: 0; } }
+  .reveal-catch { font-family: 'Jalnan2', sans-serif; font-size: 17px; color: var(--wine); margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 5px; animation: catch-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.12s both; }
+  .reveal-catch .ico-sparkle { width: 15px; height: 15px; animation: twinkle 1.6s ease-in-out infinite; }
+  @keyframes catch-pop { from { transform: scale(0.3) rotate(-8deg); opacity: 0; } to { transform: scale(1) rotate(0); opacity: 1; } }
+
+  /* --- kawaii deco: sparkles, hearts, ribbons, micro-interactions --- */
+  .ico-sparkle, .ico-heart, .ico-ribbon { display: inline-block; vertical-align: middle; fill: currentColor; }
+  @keyframes twinkle { 0%, 100% { opacity: 0.35; transform: scale(0.8) rotate(0deg); } 50% { opacity: 1; transform: scale(1.05) rotate(12deg); } }
+  @keyframes float-y { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  @keyframes pop-in { from { transform: scale(0.4); opacity: 0; } 70% { transform: scale(1.15); } to { transform: scale(1); opacity: 1; } }
+
+  .deco-sparkles { position: absolute; top: 6px; right: 24px; width: 120px; height: 90px; pointer-events: none; z-index: -1; color: var(--daypart-accent); }
+  .daypart-mood { font-size: 12.5px; color: var(--ink-soft); margin: -6px 0 18px; display: flex; align-items: center; gap: 5px; }
+  .deco-sparkles .ico-sparkle { position: absolute; }
+  .deco-sparkles .s1 { top: 4px; right: 10px; width: 20px; height: 20px; animation: twinkle 2.4s ease-in-out infinite, float-y 5s ease-in-out infinite; color: var(--daypart-accent); transition: color 0.6s ease; }
+  .deco-sparkles .s2 { top: 46px; right: 66px; width: 13px; height: 13px; animation: twinkle 2.8s ease-in-out infinite 0.6s, float-y 4.2s ease-in-out infinite 0.3s; color: var(--poem); }
+  .deco-sparkles .s3 { top: 66px; right: 20px; width: 10px; height: 10px; animation: twinkle 2.1s ease-in-out infinite 1.1s, float-y 4.8s ease-in-out infinite 0.8s; color: var(--brass); }
+
+  .sechead h2 .ico-sparkle { width: 15px; height: 15px; margin-right: 5px; color: var(--accent); animation: twinkle 2.6s ease-in-out infinite; }
+
+  .chip, .tag { transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .chip:hover, .tag:hover { transform: translateY(-2px) rotate(-2deg); }
+  .quicknav a { transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.12s ease, border-color 0.12s ease; }
+  .quicknav a:hover { transform: translateY(-2px) scale(1.04); }
+  .btn, .kakao-share-btn, .geo-btn, .kakao-btn { transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.12s ease, box-shadow 0.12s ease; }
+  .btn:active, .kakao-share-btn:active, .geo-btn:active, .kakao-btn:active { transform: scale(0.94); }
+  .kakao-share-btn:hover { animation: wiggle 0.35s ease; }
+  @keyframes wiggle { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-4deg); } 75% { transform: rotate(4deg); } }
+  .avatar-swatch { transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .avatar-swatch:hover { transform: scale(1.12) rotate(-4deg); }
+  .mycollect-bar { position: relative; }
+  .mycollect-spark { position: absolute; top: 50%; width: 14px; height: 14px; transform: translate(-50%, -50%); color: var(--paper); filter: drop-shadow(0 0 2px var(--accent)); animation: twinkle 1.8s ease-in-out infinite; pointer-events: none; transition: left 0.3s ease; }
+  .footer-ribbon { display: block; margin: 0 auto 14px; width: 40px; height: 24px; color: var(--poem); animation: float-y 4.5s ease-in-out infinite; }
+
+  /* --- podium (ranking) --- */
+  .podium { display: flex; align-items: flex-end; justify-content: center; gap: 10px; margin: 20px 0 22px; }
+  .podium-slot { display: flex; flex-direction: column; align-items: center; width: 30%; max-width: 128px; position: relative; animation: pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+  .podium-slot.rank-1 { order: 2; animation-delay: 0.05s; }
+  .podium-slot.rank-2 { order: 1; animation-delay: 0.15s; }
+  .podium-slot.rank-3 { order: 3; animation-delay: 0.25s; }
+  .p-crown { position: absolute; top: -30px; left: 50%; transform: translateX(-50%); width: 30px; height: 22px; color: var(--brass); animation: float-y 2.6s ease-in-out infinite, twinkle 2.6s ease-in-out infinite; }
+  .p-avatar-wrap { position: relative; width: 56px; height: 56px; border-radius: 50%; padding: 3px; margin-bottom: 6px; display: flex; }
+  .podium-slot.rank-1 .p-avatar-wrap { width: 70px; height: 70px; background: linear-gradient(135deg, #ffe08a, #f0a63e); box-shadow: 0 8px 18px -8px rgba(240,166,62,0.65); }
+  .podium-slot.rank-2 .p-avatar-wrap { background: linear-gradient(135deg, #eef1f8, #b9c3d6); box-shadow: 0 6px 14px -8px rgba(150,160,180,0.55); }
+  .podium-slot.rank-3 .p-avatar-wrap { background: linear-gradient(135deg, #f3c99e, #cd8a52); box-shadow: 0 6px 14px -8px rgba(180,120,70,0.5); }
+  .p-avatar-wrap .avatar-img { width: 100%; height: 100%; border-radius: 50%; background: var(--paper); overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  .p-name { font-size: 12.5px; font-weight: 700; color: var(--ink); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .p-count { font-size: 11px; color: var(--accent); font-weight: 700; margin-bottom: 8px; }
+  .podium-block { width: 100%; border-radius: 14px 14px 6px 6px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 4px; position: relative; }
+  .podium-block .p-mascot { width: 28px; height: 38px; margin-top: -16px; color: var(--paper); filter: drop-shadow(0 3px 4px rgba(0,0,0,0.18)); }
+  .podium-block .p-rank-num { font-family: 'Jalnan2', sans-serif; font-size: 20px; color: rgba(255,255,255,0.88); margin-top: 2px; }
+  .podium-slot.rank-1 .podium-block { height: 92px; background: linear-gradient(180deg, #ffe08a, #f0a63e); }
+  .podium-slot.rank-2 .podium-block { height: 68px; background: linear-gradient(180deg, #eef1f8, #aeb8cc); }
+  .podium-slot.rank-3 .podium-block { height: 54px; background: linear-gradient(180deg, #f3c99e, #c17f49); }
+  .rank-row { display: flex; align-items: center; gap: 10px; padding: 10px 6px; border-bottom: 1px dashed var(--rule); font-size: 13.5px; }
+  .rank-row:last-child { border-bottom: none; }
+  .rank-row .rank-num { width: 20px; text-align: center; font-weight: 700; color: var(--ink-soft); font-size: 12px; flex: 0 0 auto; }
+  .rank-row .avatar { flex: 0 0 auto; }
+  .rank-row .rank-name { flex: 1; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   @media (max-width: 480px) { form.panel .row { grid-template-columns: 1fr; } .shelf { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); } }
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ico-sparkle" viewBox="0 0 24 24">
+    <path d="M12 2 C12.6 7 13 9 14.2 10.4 C15.6 11.8 18 12.2 22 12.8 C18 13.4 15.6 13.8 14.2 15.2 C13 16.6 12.6 18.8 12 24 C11.4 18.8 11 16.6 9.8 15.2 C8.4 13.8 6 13.4 2 12.8 C6 12.2 8.4 11.8 9.8 10.4 C11 9 11.4 7 12 2 Z" fill="currentColor"/>
+  </symbol>
+  <symbol id="ico-heart" viewBox="0 0 24 24">
+    <path d="M12 20.5 C6.5 16.8 3 13.4 3 9.6 C3 6.8 5.2 4.8 7.8 4.8 C9.4 4.8 10.9 5.6 12 6.9 C13.1 5.6 14.6 4.8 16.2 4.8 C18.8 4.8 21 6.8 21 9.6 C21 13.4 17.5 16.8 12 20.5 Z" fill="currentColor"/>
+  </symbol>
+  <symbol id="ico-ribbon" viewBox="0 0 40 24">
+    <path d="M20 12 C16 4 9 3 4 6 C7 9 7 15 4 18 C9 21 16 20 20 12 Z" fill="currentColor" opacity="0.85"/>
+    <path d="M20 12 C24 4 31 3 36 6 C33 9 33 15 36 18 C31 21 24 20 20 12 Z" fill="currentColor" opacity="0.85"/>
+    <circle cx="20" cy="12" r="3.4" fill="currentColor"/>
+  </symbol>
+  <symbol id="ico-crown" viewBox="0 0 32 24">
+    <path d="M3 9 L8 13 L13 5 L16 11 L19 5 L24 13 L29 9 L27 20 C27 21.5 25.8 22 24.5 22 L7.5 22 C6.2 22 5 21.5 5 20 Z" fill="currentColor"/>
+    <circle cx="3" cy="7" r="2.2" fill="currentColor"/>
+    <circle cx="16" cy="4" r="2.2" fill="currentColor"/>
+    <circle cx="29" cy="7" r="2.2" fill="currentColor"/>
+  </symbol>
+  <symbol id="ico-medal" viewBox="0 0 32 40">
+    <path d="M8 2 L14 15 L4 15 Z" fill="currentColor" opacity="0.75"/>
+    <path d="M24 2 L28 15 L18 15 Z" fill="currentColor" opacity="0.75"/>
+    <circle cx="16" cy="26" r="12" fill="currentColor"/>
+    <circle cx="16" cy="26" r="8.5" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.6"/>
+  </symbol>
+  <symbol id="ico-mascot" viewBox="0 0 60 84">
+    <path d="M10 10 Q10 0 20 0 L40 0 Q50 0 50 10 L50 74 L30 60 L10 74 Z" fill="currentColor"/>
+    <ellipse cx="21" cy="28" rx="3.2" ry="4" fill="#4a332f"/>
+    <ellipse cx="39" cy="28" rx="3.2" ry="4" fill="#4a332f"/>
+    <ellipse cx="15.5" cy="38" rx="5" ry="3.2" fill="#ff9db0" opacity="0.75"/>
+    <ellipse cx="44.5" cy="38" rx="5" ry="3.2" fill="#ff9db0" opacity="0.75"/>
+    <path d="M23 41 Q30 46.5 37 41" stroke="#4a332f" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  </symbol>
+</svg>
 <div class="wrap">
   <div id="error-banner" class="banner warn">지금 서버 연결이 원활하지 않아요. 잠시 후 다시 시도해주세요.</div>
 
@@ -238,6 +338,7 @@
   <div class="panel-pop" id="reveal-panel" hidden>
     <div class="confetti-layer" id="confetti-layer"></div>
     <div class="reveal-card" id="reveal-card">
+      <div class="reveal-catch" id="reveal-catch"></div>
       <div class="reveal-band" id="reveal-band"></div>
       <div class="reveal-num" id="reveal-num"></div>
       <div class="reveal-title" id="reveal-title"></div>
@@ -254,6 +355,12 @@
     <a href="#sec-restock">입고</a>
   </nav>
 
+  <div class="deco-sparkles" aria-hidden="true">
+    <svg class="ico-sparkle s1"><use href="#ico-sparkle"/></svg>
+    <svg class="ico-sparkle s2"><use href="#ico-sparkle"/></svg>
+    <svg class="ico-sparkle s3"><use href="#ico-sparkle"/></svg>
+  </div>
+  <p class="daypart-mood" id="daypart-mood"></p>
   <p class="kicker">GS25 &times; 민음사 &times; 오늘의 귀여움</p>
   <h1 class="display">민음사 책갈피 도감</h1>
   <p class="lede">20종 정답은 커뮤니티가 다 찾아냈어요. 이제 남은 건 <b>당신의 컬렉션</b>이에요: 로그인해서 내가 가진 걸 체크하면, 남는 건 자동으로 교환글에 채워드려요. 근처 매장/입고 소식도 실시간으로 모여요.</p>
@@ -270,7 +377,7 @@
   <p class="secnote" style="margin-top:14px;">중고 시세는 정가의 최대 3배(개당 7천~1만 5천원) 수준으로 거래되고 있어요: 교환할 때 참고하세요. (출처: <a href="https://www.sisajournal-e.com/news/articleView.html?idxno=423388" style="color:inherit;">시사저널e, 2026.08.28</a>)</p>
 
   <section id="sec-checklist">
-    <div class="sechead"><h2>책갈피 도감</h2><span class="count" id="checklist-count">0/20 확인됨</span></div>
+    <div class="sechead"><h2><svg class="ico-sparkle"><use href="#ico-sparkle"/></svg>책갈피 도감</h2><span class="count" id="checklist-count">0/20 확인됨</span></div>
     <p class="secnote">공식 명단이 따로 없어서, 실제로 뽑은 분들이 알려주는 대로 채워가고 있어요. 번호를 누르면 제목 제보 또는 내 컬렉션 체크를 할 수 있어요.</p>
     <div class="mycollect" id="mycollect" hidden>
       <div class="mycollect-bar"><div class="mycollect-fill" id="mycollect-fill"></div></div>
@@ -287,13 +394,14 @@
   </section>
 
   <section id="sec-rank">
-    <div class="sechead"><h2>수집 랭킹</h2><span class="count" id="rank-count"></span></div>
+    <div class="sechead"><h2><svg class="ico-sparkle"><use href="#ico-sparkle"/></svg>수집 랭킹</h2><span class="count" id="rank-count"></span></div>
     <p class="secnote">사진 인증 없이, 각자 도감에서 체크한 컬렉션 개수로만 매기는 랭킹이에요.</p>
+    <div class="podium" id="podium"></div>
     <div class="list" id="rank-list"></div>
   </section>
 
   <section id="sec-trade">
-    <div class="sechead"><h2>교환 게시판</h2><span class="count" id="trade-count">0건</span></div>
+    <div class="sechead"><h2><svg class="ico-sparkle"><use href="#ico-sparkle"/></svg>교환 게시판</h2><span class="count" id="trade-count">0건</span></div>
     <p class="secnote">남는 책갈피와 필요한 책갈피를 적어두면 서로 찾을 수 있어요. 번개장터 같은 범용 중고거래와 달리 도감 20종 기준으로 정확히 매칭돼요. 만남/택배는 각자 연락처로 정해주세요.</p>
     <form class="panel" id="form-trade">
       <div class="row">
@@ -310,7 +418,7 @@
   </section>
 
   <section id="sec-restock">
-    <div class="sechead"><h2>입고 제보</h2><span class="count" id="restock-count">0건</span></div>
+    <div class="sechead"><h2><svg class="ico-sparkle"><use href="#ico-sparkle"/></svg>입고 제보</h2><span class="count" id="restock-count">0건</span></div>
     <p class="secnote">방금 입고된 걸 봤다면 남겨주세요. 하루 4개 제한이라 금방 사라지니, 시간이 좀 지난 제보는 참고만 해주세요.</p>
     <form class="panel" id="form-restock">
       <div class="row">
@@ -324,7 +432,7 @@
   </section>
 
   <section id="sec-stores">
-    <div class="sechead"><h2>매장 찾기</h2><span class="count" id="store-count">0곳</span></div>
+    <div class="sechead"><h2><svg class="ico-sparkle"><use href="#ico-sparkle"/></svg>매장 찾기</h2><span class="count" id="store-count">0곳</span></div>
     <p class="secnote">서울 GS25 매장 목록이에요 (카카오맵 기준, 밀집 지역은 일부만 표시될 수 있어요). 재고는 매장마다 다르니 참고만 해주세요.</p>
     <button type="button" class="geo-btn" id="geo-btn">📍 내 근처 매장 가까운 순으로 보기</button>
     <p class="geo-note">위치는 이 기기(브라우저) 안에서만 계산되고 서버로 전송/저장되지 않아요.</p>
@@ -336,14 +444,33 @@
     <div id="store-detail" class="store-detail" hidden></div>
   </section>
 
-  <footer>이 페이지는 팬이 만든 커뮤니티 페이지로, GS25/민음사 공식 서비스가 아니에요. 모든 정보는 이용자 제보로 채워지며 정확성을 보장하지 않습니다. / <a href="/privacy.html">개인정보처리방침</a></footer>
+  <footer>
+    <svg class="footer-ribbon" aria-hidden="true"><use href="#ico-ribbon"/></svg>
+    이 페이지는 팬이 만든 커뮤니티 페이지로, GS25/민음사 공식 서비스가 아니에요. 모든 정보는 이용자 제보로 채워지며 정확성을 보장하지 않습니다. / <a href="/privacy.html">개인정보처리방침</a>
+  </footer>
 </div>
 
 <script>
 (function () {
   "use strict";
 
-  var GU_LIST = ["종로구","중구","용산구","성동구","광진구","동대문구","중랑구","성북구","강북구","도봉구","노원구","은평구","서대문구","마포구","양천구","강서구","구로구","금천구","영등포구","동작구","관악구","서초구","강남구","송파구","강동구"];
+  var DAYPART_MOODS = {
+    dawn: { emoji: "🌙", text: "고요한 새벽, 혼자만의 독서 시간" },
+    morning: { emoji: "🌤️", text: "상쾌한 아침, 책 한 장으로 하루 시작" },
+    afternoon: { emoji: "☀️", text: "햇살 좋은 오후, 휴양지st 독서 타임" },
+    evening: { emoji: "🌇", text: "노을 지는 저녁, 하루를 마무리하는 페이지" },
+    night: { emoji: "✨", text: "깊은 밤, 책과 함께 조용히" },
+  };
+  (function applyDaypart() {
+    var h = new Date().getHours();
+    var part = (h >= 4 && h < 7) ? "dawn" : (h >= 7 && h < 11) ? "morning" : (h >= 11 && h < 17) ? "afternoon" : (h >= 17 && h < 20) ? "evening" : "night";
+    document.documentElement.setAttribute("data-daypart", part);
+    var mood = DAYPART_MOODS[part];
+    var el = document.getElementById("daypart-mood");
+    if (el) el.textContent = mood.emoji + " " + mood.text;
+  })();
+
+  var GU_LIST =["종로구","중구","용산구","성동구","광진구","동대문구","중랑구","성북구","강북구","도봉구","노원구","은평구","서대문구","마포구","양천구","강서구","구로구","금천구","영등포구","동작구","관악구","서초구","강남구","송파구","강동구"];
 
   var STATE = { checklist: [], trades: [], restocks: [], leaderboard: [] };
   var STORES = [];
@@ -489,7 +616,7 @@
       var data = await r.json();
       list.innerHTML = "";
       if (!data.messages || data.messages.length === 0) {
-        list.innerHTML = '<p class="empty-hint">아직 받은 쪽지가 없어요.</p>';
+        list.innerHTML = '<p class="empty-hint"><svg class="ico-heart"><use href="#ico-heart"/></svg>아직 받은 쪽지가 없어요.</p>';
       } else {
         data.messages.forEach(function (m) {
           var item = document.createElement("div"); item.className = "inbox-item";
@@ -520,7 +647,7 @@
       }
       STATE.me.unread = 0;
       renderAuthbar();
-    } catch (e) { list.innerHTML = '<p class="empty-hint">불러오지 못했어요.</p>'; }
+    } catch (e) { list.innerHTML = '<p class="empty-hint"><svg class="ico-heart"><use href="#ico-heart"/></svg>불러오지 못했어요.</p>'; }
   }
   document.getElementById("inbox-close").addEventListener("click", function () { document.getElementById("inbox-panel").hidden = true; });
 
@@ -570,7 +697,8 @@
       var title = document.createElement("div"); title.className = "title"; title.textContent = item.title ? item.title : "미확인";
       btn.appendChild(band); btn.appendChild(num); btn.appendChild(title);
       if (isOwned) {
-        var mark = document.createElement("div"); mark.className = "own-mark"; mark.textContent = "✓";
+        var mark = document.createElement("div"); mark.className = "own-mark";
+        mark.innerHTML = '<svg><use href="#ico-heart"/></svg>';
         btn.appendChild(mark);
       }
       btn.title = item.title
@@ -591,6 +719,14 @@
       var pct = Math.round((owned.length / 20) * 100);
       document.getElementById("mycollect-fill").style.width = pct + "%";
       document.getElementById("mycollect-label").textContent = "내 컬렉션 " + owned.length + "/20";
+      var spark = document.getElementById("mycollect-spark");
+      if (!spark) {
+        spark = document.createElement("svg");
+        spark.id = "mycollect-spark"; spark.className = "mycollect-spark";
+        spark.innerHTML = '<use href="#ico-sparkle"/>';
+        document.getElementById("mycollect-bar").appendChild(spark);
+      }
+      spark.style.left = pct + "%";
     } else {
       mc.hidden = true;
     }
@@ -611,7 +747,13 @@
     }
   }
 
+  var CATCH_PHRASES = ["너로 정했다!", "갓챠!", "찾았다!", "획득 완료!"];
   function showRevealCard(item, ownedCount) {
+    var catchEl = document.getElementById("reveal-catch");
+    catchEl.innerHTML = "";
+    var sparkIcon = '<svg class="ico-sparkle"><use href="#ico-sparkle"/></svg>';
+    catchEl.innerHTML = sparkIcon + CATCH_PHRASES[Math.floor(Math.random() * CATCH_PHRASES.length)] + sparkIcon;
+    catchEl.style.animation = "none"; catchEl.offsetWidth; catchEl.style.animation = "";
     document.getElementById("reveal-band").className = "reveal-band " + item.category;
     document.getElementById("reveal-num").textContent = "#" + item.id;
     document.getElementById("reveal-title").textContent = item.title;
@@ -657,23 +799,53 @@
   }
 
   function renderLeaderboard() {
+    var podium = document.getElementById("podium");
     var list = document.getElementById("rank-list");
     var board = STATE.leaderboard || [];
     document.getElementById("rank-count").textContent = board.length > 0 ? "TOP " + board.length : "";
-    list.innerHTML = "";
+    podium.innerHTML = ""; list.innerHTML = "";
+
     if (board.length === 0) {
-      var p = document.createElement("p"); p.className = "empty-hint"; p.textContent = "아직 컬렉션을 체크한 사람이 없어요. 첫 번째로 도전해보세요.";
-      list.appendChild(p); return;
+      podium.hidden = true;
+      var p = document.createElement("p"); p.className = "empty-hint";
+      p.innerHTML = '<svg class="ico-heart"><use href="#ico-heart"/></svg>아직 컬렉션을 체크한 사람이 없어요. 첫 번째로 도전해보세요.';
+      list.appendChild(p);
+      return;
     }
-    var medals = ["🥇", "🥈", "🥉"];
-    board.forEach(function (r, i) {
-      var card = document.createElement("div"); card.className = "card";
-      card.style.display = "flex"; card.style.justifyContent = "space-between"; card.style.alignItems = "center";
-      var left = document.createElement("span");
-      left.textContent = (medals[i] || (i + 1) + "위") + "  " + r.name;
-      var right = document.createElement("span"); right.className = "tag"; right.textContent = r.count + "/20";
-      card.appendChild(left); card.appendChild(right);
-      list.appendChild(card);
+    podium.hidden = false;
+
+    board.slice(0, 3).forEach(function (r, i) {
+      var rank = i + 1;
+      var slot = document.createElement("div");
+      slot.className = "podium-slot rank-" + rank;
+
+      var avatarWrap = document.createElement("div"); avatarWrap.className = "p-avatar-wrap";
+      if (rank === 1) {
+        avatarWrap.insertAdjacentHTML("beforeend", '<svg class="p-crown"><use href="#ico-crown"/></svg>');
+      }
+      var avatarImg = document.createElement("div"); avatarImg.className = "avatar-img";
+      avatarImg.innerHTML = avatarSVG(r.avatar, rank === 1 ? 58 : 46);
+      avatarWrap.appendChild(avatarImg);
+
+      var name = document.createElement("div"); name.className = "p-name"; name.textContent = r.name;
+      var count = document.createElement("div"); count.className = "p-count"; count.textContent = r.count + "/20";
+
+      var block = document.createElement("div"); block.className = "podium-block";
+      block.innerHTML = '<svg class="p-mascot"><use href="#ico-mascot"/></svg><div class="p-rank-num">' + rank + "</div>";
+
+      slot.appendChild(avatarWrap); slot.appendChild(name); slot.appendChild(count); slot.appendChild(block);
+      podium.appendChild(slot);
+    });
+
+    board.slice(3).forEach(function (r, i) {
+      var row = document.createElement("div"); row.className = "rank-row";
+      var numEl = document.createElement("span"); numEl.className = "rank-num"; numEl.textContent = i + 4;
+      var avEl = document.createElement("span"); avEl.className = "avatar"; avEl.style.width = "24px"; avEl.style.height = "24px";
+      avEl.innerHTML = avatarSVG(r.avatar, 24);
+      var nameEl = document.createElement("span"); nameEl.className = "rank-name"; nameEl.textContent = r.name;
+      var tagEl = document.createElement("span"); tagEl.className = "tag"; tagEl.textContent = r.count + "/20";
+      row.appendChild(numEl); row.appendChild(avEl); row.appendChild(nameEl); row.appendChild(tagEl);
+      list.appendChild(row);
     });
   }
 
@@ -716,7 +888,7 @@
     list.innerHTML = "";
     document.getElementById("trade-count").textContent = STATE.trades.length + "건";
     if (STATE.trades.length === 0) {
-      var p = document.createElement("p"); p.className = "empty-hint"; p.textContent = "아직 등록된 교환 글이 없어요. 첫 글을 올려보세요.";
+      var p = document.createElement("p"); p.className = "empty-hint"; p.innerHTML = '<svg class="ico-heart"><use href="#ico-heart"/></svg>아직 등록된 교환 글이 없어요. 첫 글을 올려보세요.';
       list.appendChild(p); return;
     }
     STATE.trades.slice().reverse().forEach(function (t) {
