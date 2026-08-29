@@ -64,7 +64,8 @@
   :root[data-daypart="evening"] { --daypart-glow: #ffd9c2; --daypart-accent: #ff8f6b; }
   :root[data-daypart="night"] { --daypart-glow: #ded8f5; --daypart-accent: #9081d6; }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Gowun Dodum', 'Noto Sans KR', 'Malgun Gothic', sans-serif; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+  html { overflow-x: hidden; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Gowun Dodum', 'Noto Sans KR', 'Malgun Gothic', sans-serif; line-height: 1.65; -webkit-font-smoothing: antialiased; overflow-x: hidden; max-width: 100vw; }
   .wrap { max-width: 760px; margin: 0 auto; padding: 48px 20px 96px; position: relative; }
   .wrap::before {
     content: ""; position: absolute; top: -60px; right: -80px; width: 280px; height: 280px;
@@ -143,6 +144,10 @@
   .quicknav { position: sticky; top: 0; z-index: 10; display: flex; gap: 6px; background: var(--paper-glass); backdrop-filter: blur(14px) saturate(140%); -webkit-backdrop-filter: blur(14px) saturate(140%); padding: 14px 12px; margin: -14px -12px 20px; border-radius: 0 0 18px 18px; border-bottom: 1px solid var(--rule); }
   .quicknav a { flex: 1; text-align: center; font-size: 12.5px; font-weight: 700; color: var(--ink-soft); text-decoration: none; padding: 9px 4px; border-radius: 999px; background: var(--raised-glass); border: 1px solid var(--rule); }
   .quicknav a:hover, .quicknav a:focus-visible { color: var(--accent); border-color: var(--accent); }
+  .quicknav a.active { color: #fff; background: var(--accent); border-color: var(--accent); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: tab-fade-in 0.2s ease; }
+  @keyframes tab-fade-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
   .skeleton { background: linear-gradient(90deg, var(--paper-raised) 25%, var(--rule) 37%, var(--paper-raised) 63%); background-size: 400% 100%; animation: shimmer 1.4s ease infinite; border-radius: 8px; }
   @keyframes shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
   .store-row .dist { font-size: 11.5px; color: var(--accent); font-weight: 700; white-space: nowrap; }
@@ -351,14 +356,6 @@
     </div>
   </div>
 
-  <nav class="quicknav">
-    <a href="#sec-checklist">도감</a>
-    <a href="#sec-rank">랭킹</a>
-    <a href="#sec-trade">교환</a>
-    <a href="#sec-stores">매장</a>
-    <a href="#sec-restock">입고</a>
-  </nav>
-
   <div class="deco-sparkles" aria-hidden="true">
     <svg class="ico-sparkle s1"><use href="#ico-sparkle"/></svg>
     <svg class="ico-sparkle s2"><use href="#ico-sparkle"/></svg>
@@ -380,11 +377,19 @@
   </div>
   <p class="secnote" style="margin-top:14px;">중고 시세는 정가의 최대 3배(개당 7천~1만 5천원) 수준으로 거래되고 있어요: 교환할 때 참고하세요. (출처: <a href="https://www.sisajournal-e.com/news/articleView.html?idxno=423388" style="color:inherit;">시사저널e, 2026.08.28</a>)</p>
 
-  <section id="sec-checklist">
+  <nav class="quicknav">
+    <a href="#sec-checklist" data-tab="sec-checklist">도감</a>
+    <a href="#sec-rank" data-tab="sec-rank">랭킹</a>
+    <a href="#sec-trade" data-tab="sec-trade">교환</a>
+    <a href="#sec-stores" data-tab="sec-stores">매장</a>
+    <a href="#sec-restock" data-tab="sec-restock">입고</a>
+  </nav>
+
+  <section id="sec-checklist" class="tab-panel">
     <div class="sechead"><h2><svg class="ico-sparkle"><use href="#ico-sparkle"/></svg>책갈피 도감</h2><span class="count" id="checklist-count">0/20 확인됨</span></div>
     <p class="secnote">공식 명단이 따로 없어서, 실제로 뽑은 분들이 알려주는 대로 채워가고 있어요. 번호를 누르면 제목 제보 또는 내 컬렉션 체크를 할 수 있어요.</p>
     <div class="mycollect" id="mycollect" hidden>
-      <div class="mycollect-bar"><div class="mycollect-fill" id="mycollect-fill"></div></div>
+      <div class="mycollect-bar" id="mycollect-bar"><div class="mycollect-fill" id="mycollect-fill"></div></div>
       <span id="mycollect-label">내 컬렉션 0/20</span>
     </div>
     <div class="shelf-group"><div class="shelf-label">세계문학전집 (15종)</div><div class="shelf" id="shelf-lit"></div></div>
@@ -397,14 +402,14 @@
     </form>
   </section>
 
-  <section id="sec-rank">
+  <section id="sec-rank" class="tab-panel">
     <div class="sechead"><h2><svg class="ico-sparkle"><use href="#ico-sparkle"/></svg>수집 랭킹</h2><span class="count" id="rank-count"></span></div>
     <p class="secnote">사진 인증 없이, 각자 도감에서 체크한 컬렉션 개수로만 매기는 랭킹이에요.</p>
     <div class="podium" id="podium"></div>
     <div class="list" id="rank-list"></div>
   </section>
 
-  <section id="sec-trade">
+  <section id="sec-trade" class="tab-panel">
     <div class="sechead"><h2><svg class="ico-sparkle"><use href="#ico-sparkle"/></svg>교환 게시판</h2><span class="count" id="trade-count">0건</span></div>
     <p class="secnote">남는 책갈피와 필요한 책갈피를 적어두면 서로 찾을 수 있어요. 번개장터 같은 범용 중고거래와 달리 도감 20종 기준으로 정확히 매칭돼요. 만남/택배는 각자 연락처로 정해주세요.</p>
     <form class="panel" id="form-trade">
@@ -421,7 +426,7 @@
     <div class="list" id="trade-list"></div>
   </section>
 
-  <section id="sec-restock">
+  <section id="sec-restock" class="tab-panel">
     <div class="sechead"><h2><svg class="ico-sparkle"><use href="#ico-sparkle"/></svg>입고 제보</h2><span class="count" id="restock-count">0건</span></div>
     <p class="secnote">방금 입고된 걸 봤다면 남겨주세요. 하루 4개 제한이라 금방 사라지니, 시간이 좀 지난 제보는 참고만 해주세요.</p>
     <form class="panel" id="form-restock">
@@ -435,7 +440,7 @@
     <div class="list" id="restock-list"></div>
   </section>
 
-  <section id="sec-stores">
+  <section id="sec-stores" class="tab-panel">
     <div class="sechead"><h2><svg class="ico-sparkle"><use href="#ico-sparkle"/></svg>매장 찾기</h2><span class="count" id="store-count">0곳</span></div>
     <p class="secnote">서울 GS25 매장 목록이에요 (카카오맵 기준, 밀집 지역은 일부만 표시될 수 있어요). 재고는 매장마다 다르니 참고만 해주세요.</p>
     <button type="button" class="geo-btn" id="geo-btn">📍 내 근처 매장 가까운 순으로 보기</button>
@@ -473,6 +478,32 @@
     var el = document.getElementById("daypart-mood");
     if (el) el.textContent = mood.emoji + " " + mood.text;
   })();
+
+  var TAB_IDS = ["sec-checklist", "sec-rank", "sec-trade", "sec-stores", "sec-restock"];
+  function showTab(id) {
+    if (TAB_IDS.indexOf(id) === -1) id = TAB_IDS[0];
+    TAB_IDS.forEach(function (tid) {
+      var panel = document.getElementById(tid);
+      if (panel) panel.classList.toggle("active", tid === id);
+    });
+    document.querySelectorAll(".quicknav a").forEach(function (a) {
+      a.classList.toggle("active", a.getAttribute("data-tab") === id);
+    });
+  }
+  document.querySelectorAll(".quicknav a").forEach(function (a) {
+    a.addEventListener("click", function (e) {
+      e.preventDefault();
+      var id = a.getAttribute("data-tab");
+      showTab(id);
+      history.replaceState(null, "", "#" + id);
+      document.querySelector(".quicknav").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+  window.addEventListener("hashchange", function () {
+    var id = location.hash.replace("#", "");
+    if (TAB_IDS.indexOf(id) !== -1) showTab(id);
+  });
+  showTab(location.hash.replace("#", ""));
 
   var GU_LIST =["종로구","중구","용산구","성동구","광진구","동대문구","중랑구","성북구","강북구","도봉구","노원구","은평구","서대문구","마포구","양천구","강서구","구로구","금천구","영등포구","동작구","관악구","서초구","강남구","송파구","강동구"];
 
@@ -725,10 +756,11 @@
       document.getElementById("mycollect-label").textContent = "내 컬렉션 " + owned.length + "/20";
       var spark = document.getElementById("mycollect-spark");
       if (!spark) {
-        spark = document.createElement("svg");
-        spark.id = "mycollect-spark"; spark.className = "mycollect-spark";
-        spark.innerHTML = '<use href="#ico-sparkle"/>';
-        document.getElementById("mycollect-bar").appendChild(spark);
+        document.getElementById("mycollect-bar").insertAdjacentHTML(
+          "beforeend",
+          '<svg id="mycollect-spark" class="mycollect-spark"><use href="#ico-sparkle"/></svg>'
+        );
+        spark = document.getElementById("mycollect-spark");
       }
       spark.style.left = pct + "%";
     } else {
@@ -776,15 +808,9 @@
     if (revealedItemId != null) { toggleOwn(revealedItemId); revealedItemId = null; }
   });
 
-  var toggleQueue = {};
+  var toggleSyncQueue = {};
   function toggleOwn(id) {
-    var prev = toggleQueue[id] || Promise.resolve();
-    var next = prev.then(function () { return doToggleOwn(id); });
-    toggleQueue[id] = next;
-    return next;
-  }
-
-  function doToggleOwn(id) {
+    // Optimistic UI update happens immediately on every click — never waits on network.
     STATE.myOwned = STATE.myOwned || [];
     var idx = STATE.myOwned.indexOf(id);
     var wasOwned = idx !== -1;
@@ -796,17 +822,22 @@
     }
     renderChecklist();
 
-    return apiPost({ type: "toggle_own", id: id }).then(function (freshState) {
-      STATE = freshState;
-      renderChecklist();
-      renderLeaderboard();
-    }).catch(function (err) {
-      if (wasOwned) { STATE.myOwned.push(id); } else {
-        var i2 = STATE.myOwned.indexOf(id); if (i2 !== -1) STATE.myOwned.splice(i2, 1);
-      }
-      renderChecklist();
-      if (err.code === "login_required") { window.location.href = "/api/auth/login"; return; }
-      showError();
+    // Server sync is serialized per id in the background so rapid taps land in order,
+    // but a failed/slow sync never blocks the next tap's optimistic update above.
+    var prevSync = toggleSyncQueue[id] || Promise.resolve();
+    toggleSyncQueue[id] = prevSync.catch(function () {}).then(function () {
+      return apiPost({ type: "toggle_own", id: id }).then(function (freshState) {
+        STATE = freshState;
+        renderChecklist();
+        renderLeaderboard();
+      }).catch(function (err) {
+        if (wasOwned) { STATE.myOwned.push(id); } else {
+          var i2 = STATE.myOwned.indexOf(id); if (i2 !== -1) STATE.myOwned.splice(i2, 1);
+        }
+        renderChecklist();
+        if (err.code === "login_required") { window.location.href = "/api/auth/login"; return; }
+        showError();
+      });
     });
   }
 
