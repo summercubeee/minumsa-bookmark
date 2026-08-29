@@ -76,6 +76,8 @@
   .display { font-family: 'Jalnan2', 'Gowun Dodum', sans-serif; text-wrap: balance; }
   h1.display { font-size: clamp(28px, 6vw, 40px); font-weight: 400; margin: 0 0 10px; letter-spacing: -0.01em; }
   .daily-mascot { width: 58px; height: 66px; float: right; margin: -6px 0 8px 12px; animation: float-y 5s ease-in-out infinite; }
+  .daily-mascot.pop { animation: float-y 5s ease-in-out infinite, mascot-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  @keyframes mascot-pop { from { transform: scale(0.5) rotate(-10deg); opacity: 0.4; } to { transform: scale(1) rotate(0); opacity: 1; } }
   .kicker { font-size: 12px; letter-spacing: 0.1em; color: var(--brass); font-weight: 700; margin: 0 0 10px; }
   .lede { color: var(--ink-soft); font-size: 15.5px; margin: 0 0 22px; max-width: 58ch; }
   .lede b { color: var(--accent); }
@@ -548,12 +550,21 @@
     if (el) el.textContent = mood.emoji + " " + mood.text;
   })();
 
-  (function pickDailyMascot() {
-    var BLOB_IDS = ["ico-blob-bear", "ico-blob-cat", "ico-blob-rabbit", "ico-blob-dog", "ico-blob-chick"];
-    var pick = BLOB_IDS[Math.floor(Math.random() * BLOB_IDS.length)];
+  var BLOB_IDS = ["ico-blob-bear", "ico-blob-cat", "ico-blob-rabbit", "ico-blob-dog", "ico-blob-chick"];
+  var currentMascot = null;
+  function pickDailyMascot() {
+    var choices = BLOB_IDS.filter(function (b) { return b !== currentMascot; });
+    currentMascot = choices[Math.floor(Math.random() * choices.length)];
     var use = document.getElementById("daily-mascot-use");
-    if (use) use.setAttribute("href", "#" + pick);
-  })();
+    if (use) use.setAttribute("href", "#" + currentMascot);
+    var mascotEl = document.getElementById("daily-mascot");
+    if (mascotEl) {
+      mascotEl.classList.remove("pop");
+      void mascotEl.offsetWidth;
+      mascotEl.classList.add("pop");
+    }
+  }
+  pickDailyMascot();
 
   var TAB_IDS = ["sec-checklist", "sec-rank", "sec-trade", "sec-stores", "sec-restock"];
   function showTab(id) {
@@ -565,6 +576,7 @@
     document.querySelectorAll(".quicknav a").forEach(function (a) {
       a.classList.toggle("active", a.getAttribute("data-tab") === id);
     });
+    pickDailyMascot();
     if (id === "sec-stores" && mapReady && kakaoMap) {
       // Kakao Maps lays out tiles wrong if the container was hidden (display:none) at init time.
       kakaoMap.relayout();
