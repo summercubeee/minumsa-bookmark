@@ -5,12 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>민음사 책갈피 도감</title>
 <meta name="description" content="민음사빵 책갈피 20종을 함께 채우는 도감, 교환 게시판, 입고 제보, 서울 매장 찾기">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="민음사 책갈피 도감">
+<meta property="og:title" content="민음사 책갈피 도감 — 20종 다 채운 사람 아직 없어요">
+<meta property="og:description" content="같이 채우고, 남는 건 바로 교환해요. 도감 · 교환 게시판 · 서울 매장 찾기">
+<meta property="og:image" content="https://minumsa-bookmark.site/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://minumsa-bookmark.site/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="민음사 책갈피 도감 — 20종 다 채운 사람 아직 없어요">
+<meta name="twitter:description" content="같이 채우고, 남는 건 바로 교환해요. 도감 · 교환 게시판 · 서울 매장 찾기">
+<meta name="twitter:image" content="https://minumsa-bookmark.site/assets/og-image.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔖</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="preload" as="font" href="/assets/fonts/Jalnan2.woff2" type="font/woff2" crossorigin>
 <script defer src="//dapi.kakao.com/v2/maps/sdk.js?appkey=98457af62383630861d01942fe5c8018&autoload=false"></script>
+<script defer src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js"></script>
 <style>
   @font-face {
     font-family: 'Jalnan2';
@@ -127,8 +140,21 @@
   .geo-btn { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 9px 15px; font-size: 13px; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
   .geo-btn:disabled { opacity: 0.5; cursor: default; }
   .kakao-map { width: 100%; height: 300px; border-radius: 18px; border: 1px solid var(--rule); margin-bottom: 16px; background: var(--paper-raised); }
+  .store-detail { background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 16px; padding: 16px 18px; margin: -4px 0 16px; box-shadow: var(--shadow); animation: store-detail-in 0.2s ease; }
+  .store-detail .sd-name { font-weight: 700; font-size: 15px; color: var(--ink); }
+  .store-detail .sd-addr { color: var(--ink-soft); font-size: 13px; margin-top: 4px; }
+  .store-detail .sd-dist { display: inline-block; margin-top: 8px; font-size: 12px; font-weight: 700; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 3px 10px; }
+  .store-detail .sd-links { display: flex; gap: 8px; margin-top: 12px; }
+  .store-detail .sd-links a { flex: 1; text-align: center; font-size: 13px; font-weight: 700; text-decoration: none; padding: 9px 10px; border-radius: 999px; border: 1px solid var(--rule); }
+  .store-detail .sd-links a.sd-kakao { color: var(--accent); }
+  .store-detail .sd-links a.sd-naver { color: var(--mint); }
+  .store-detail .sd-close { position: relative; float: right; background: none; border: none; color: var(--ink-soft); font-size: 16px; cursor: pointer; padding: 0 2px; line-height: 1; }
+  @keyframes store-detail-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
   .geo-note { font-size: 11.5px; color: var(--ink-soft); margin: -4px 0 14px; }
   .authbar .kakao-btn { display: inline-flex; align-items: center; gap: 6px; background: #FEE500; color: #191600; border: none; padding: 8px 15px; border-radius: 999px; font-weight: 700; font-size: 12.5px; cursor: pointer; text-decoration: none; }
+  .kakao-share-btn { display: inline-flex; align-items: center; gap: 7px; background: #FEE500; color: #191600; border: none; padding: 11px 20px; border-radius: 999px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; margin: 2px 0 20px; box-shadow: 0 8px 16px -10px rgba(25,22,0,0.35); }
+  .kakao-share-btn:hover { opacity: 0.92; transform: translateY(-1px); }
+  .kakao-share-btn:disabled { opacity: 0.5; cursor: not-allowed; }
   .authbar .link-btn { background: none; border: none; color: var(--ink-soft); font-size: 12.5px; text-decoration: underline; cursor: pointer; padding: 0; }
   .del-btn { background: none; border: none; color: var(--ink-soft); font-size: 11.5px; text-decoration: underline; cursor: pointer; padding: 0; margin-left: 8px; }
   .authbar .avatar { width: 28px; height: 28px; border-radius: 50%; flex: 0 0 auto; }
@@ -205,6 +231,8 @@
   <h1 class="display">민음사 책갈피 도감</h1>
   <p class="lede">20종 정답은 커뮤니티가 다 찾아냈어요. 이제 남은 건 <b>당신의 컬렉션</b>이에요: 로그인해서 내가 가진 걸 체크하면, 남는 건 자동으로 교환글에 채워드려요. 근처 매장/입고 소식도 실시간으로 모여요.</p>
 
+  <button type="button" class="kakao-share-btn" id="kakao-share-btn">💬 카카오톡으로 공유하기</button>
+
   <div class="factrow">
     <span class="chip"><b>1차</b>&nbsp;8.21 출시</span>
     <span class="chip"><b>2차</b>&nbsp;8.26 출시</span>
@@ -278,6 +306,7 @@
       <div><label for="store-q">매장명 검색</label><input id="store-q" type="text" placeholder="예: 강남, 역삼" /></div>
     </form>
     <div id="kakao-map" class="kakao-map"></div>
+    <div id="store-detail" class="store-detail" hidden></div>
   </section>
 
   <footer>이 페이지는 팬이 만든 커뮤니티 페이지로, GS25/민음사 공식 서비스가 아니에요. 모든 정보는 이용자 제보로 채워지며 정확성을 보장하지 않습니다. / <a href="/privacy.html">개인정보처리방침</a></footer>
@@ -797,6 +826,29 @@
     window.addEventListener("load", initKakaoMap);
   }
 
+  function hideStoreDetail() {
+    document.getElementById("store-detail").hidden = true;
+  }
+
+  function showStoreDetail(s) {
+    var el = document.getElementById("store-detail");
+    var kakaoUrl = "https://map.kakao.com/link/map/" + encodeURIComponent(s.name) + "," + s.lat + "," + s.lng;
+    var naverUrl = "https://map.naver.com/p/search/" + encodeURIComponent(s.name + " " + s.address);
+    var distHtml = (typeof s._dist === "number") ? '<span class="sd-dist">' + s._dist.toFixed(1) + "km</span>" : "";
+    el.innerHTML =
+      '<button type="button" class="sd-close" aria-label="닫기">&times;</button>' +
+      '<div class="sd-name">' + s.name + "</div>" +
+      '<div class="sd-addr">' + s.address + "</div>" +
+      distHtml +
+      '<div class="sd-links">' +
+      '<a class="sd-kakao" href="' + kakaoUrl + '" target="_blank" rel="noopener">카카오맵</a>' +
+      '<a class="sd-naver" href="' + naverUrl + '" target="_blank" rel="noopener">네이버맵</a>' +
+      "</div>";
+    el.hidden = false;
+    el.querySelector(".sd-close").addEventListener("click", hideStoreDetail);
+    el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
   function updateMapMarkers(stores) {
     if (!mapReady || !kakaoMap) return;
     mapMarkers.forEach(function (m) { m.setMap(null); });
@@ -806,19 +858,11 @@
     stores.slice(0, 40).forEach(function (s) {
       var pos = new kakao.maps.LatLng(parseFloat(s.lat), parseFloat(s.lng));
       var marker = new kakao.maps.Marker({ position: pos, map: kakaoMap, title: s.name });
-      var kakaoUrl = "https://map.kakao.com/link/map/" + encodeURIComponent(s.name) + "," + s.lat + "," + s.lng;
-      var naverUrl = "https://map.naver.com/p/search/" + encodeURIComponent(s.name + " " + s.address);
-      var infoHtml = '<div style="padding:10px 12px;font-size:12.5px;max-width:200px;line-height:1.5;">' +
-        '<div style="font-weight:700;margin-bottom:2px;">' + s.name + '</div>' +
-        '<div style="color:#888;margin-bottom:6px;">' + s.address + '</div>' +
-        '<a href="' + kakaoUrl + '" target="_blank" rel="noopener" style="color:#ff7a93;font-weight:700;text-decoration:none;">카카오지도에서 보기</a><br>' +
-        '<a href="' + naverUrl + '" target="_blank" rel="noopener" style="color:#3fae7f;font-weight:700;text-decoration:none;">네이버지도에서 보기</a>' +
-        '</div>';
-      var info = new kakao.maps.InfoWindow({ content: infoHtml });
-      kakao.maps.event.addListener(marker, "click", function () { info.open(kakaoMap, marker); });
+      kakao.maps.event.addListener(marker, "click", function () { showStoreDetail(s); });
       mapMarkers.push(marker);
       bounds.extend(pos);
     });
+    hideStoreDetail();
     if (myGeo) {
       bounds.extend(new kakao.maps.LatLng(myGeo.lat, myGeo.lng));
     }
@@ -857,6 +901,30 @@
 
   function setReadOnly() {
     document.querySelectorAll(".btn[type=submit]").forEach(function (b) { b.disabled = true; });
+  }
+
+  function initKakaoShare() {
+    if (typeof Kakao === "undefined") return;
+    if (!Kakao.isInitialized()) Kakao.init("98457af62383630861d01942fe5c8018");
+    document.getElementById("kakao-share-btn").addEventListener("click", function () {
+      Kakao.Share.sendDefault({
+        objectType: "feed",
+        content: {
+          title: "민음사 책갈피 도감",
+          description: "20종 다 채운 사람 아직 없어요. 같이 채우고, 남는 건 바로 교환해요.",
+          imageUrl: "https://minumsa-bookmark.site/assets/og-image.png",
+          link: { mobileWebUrl: "https://minumsa-bookmark.site/", webUrl: "https://minumsa-bookmark.site/" },
+        },
+        buttons: [
+          { title: "도감 보러가기", link: { mobileWebUrl: "https://minumsa-bookmark.site/", webUrl: "https://minumsa-bookmark.site/" } },
+        ],
+      });
+    });
+  }
+  if (typeof Kakao !== "undefined") {
+    initKakaoShare();
+  } else {
+    window.addEventListener("load", initKakaoShare);
   }
 
   (async function init() {
