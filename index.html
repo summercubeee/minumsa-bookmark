@@ -625,7 +625,7 @@
   });
 
   var togglePending = {};
-  async function toggleOwn(id) {
+  function toggleOwn(id) {
     if (togglePending[id]) return;
     togglePending[id] = true;
 
@@ -633,27 +633,27 @@
     var idx = STATE.myOwned.indexOf(id);
     var wasOwned = idx !== -1;
     if (wasOwned) { STATE.myOwned.splice(idx, 1); } else { STATE.myOwned.push(id); }
+
+    if (!wasOwned) {
+      var item = STATE.checklist.filter(function (i) { return i.id === id; })[0];
+      if (item) { item.ownerCount = (item.ownerCount || 0) + 1; showRevealCard(item, item.ownerCount); }
+    }
     renderChecklist();
 
-    try {
-      var freshState = await apiPost({ type: "toggle_own", id: id });
+    apiPost({ type: "toggle_own", id: id }).then(function (freshState) {
       STATE = freshState;
       renderChecklist();
       renderLeaderboard();
-      if (!wasOwned) {
-        var item = STATE.checklist.filter(function (i) { return i.id === id; })[0];
-        if (item) showRevealCard(item, item.ownerCount || 1);
-      }
-    } catch (err) {
+    }).catch(function (err) {
       if (wasOwned) { STATE.myOwned.push(id); } else {
         var i2 = STATE.myOwned.indexOf(id); if (i2 !== -1) STATE.myOwned.splice(i2, 1);
       }
       renderChecklist();
       if (err.code === "login_required") { window.location.href = "/api/auth/login"; return; }
       showError();
-    } finally {
+    }).finally(function () {
       delete togglePending[id];
-    }
+    });
   }
 
   function renderLeaderboard() {
