@@ -1,6 +1,7 @@
 const { Redis } = require("@upstash/redis");
 const { getSession } = require("./_session");
 const { getProfile, AVATAR_COUNT } = require("./_profile");
+const { checkRateLimit } = require("./_ratelimit");
 
 const redis = Redis.fromEnv();
 
@@ -137,6 +138,10 @@ module.exports = async (req, res) => {
           res.status(400).json({ error: "title_required" });
           return;
         }
+        if (!(await checkRateLimit(redis, `rl:identify:${session.uid}`, 20, 600))) {
+          res.status(429).json({ error: "rate_limited" });
+          return;
+        }
         await redis.hset("checklist", {
           [String(id)]: JSON.stringify({ title, note: note || null, byUid: session.uid, byName: profile.nickname }),
         });
@@ -147,6 +152,10 @@ module.exports = async (req, res) => {
         const note = clean(body.note, 80);
         if (!have || !want || !GU_LIST.includes(gu)) {
           res.status(400).json({ error: "invalid_trade" });
+          return;
+        }
+        if (!(await checkRateLimit(redis, `rl:trade:${session.uid}`, 10, 600))) {
+          res.status(429).json({ error: "rate_limited" });
           return;
         }
         const id = String(Date.now()) + Math.random().toString(36).slice(2, 6);
@@ -161,6 +170,10 @@ module.exports = async (req, res) => {
         const note = clean(body.note, 80);
         if (!time || !GU_LIST.includes(gu)) {
           res.status(400).json({ error: "invalid_restock" });
+          return;
+        }
+        if (!(await checkRateLimit(redis, `rl:restock:${session.uid}`, 10, 600))) {
+          res.status(429).json({ error: "rate_limited" });
           return;
         }
         const id = String(Date.now()) + Math.random().toString(36).slice(2, 6);

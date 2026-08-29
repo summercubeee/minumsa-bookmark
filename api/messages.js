@@ -1,6 +1,7 @@
 const { Redis } = require("@upstash/redis");
 const { getSession } = require("./_session");
 const { getProfile } = require("./_profile");
+const { checkRateLimit } = require("./_ratelimit");
 
 const redis = Redis.fromEnv();
 
@@ -55,6 +56,10 @@ module.exports = async (req, res) => {
     }
 
     try {
+      if (!(await checkRateLimit(redis, `rl:message:${session.uid}`, 20, 600))) {
+        res.status(429).json({ error: "rate_limited" });
+        return;
+      }
       const profile = await getProfile(redis, session.uid);
       const msg = {
         id: String(Date.now()) + Math.random().toString(36).slice(2, 6),

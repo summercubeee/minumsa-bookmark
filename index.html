@@ -198,6 +198,7 @@
   .reveal-num { font-family: 'Jalnan2', sans-serif; font-size: 14px; color: var(--ink-soft); margin-bottom: 6px; }
   .reveal-title { font-family: 'Jalnan2', 'Gowun Dodum', sans-serif; font-size: 24px; color: var(--ink); margin-bottom: 14px; line-height: 1.35; text-wrap: balance; }
   .reveal-stat { font-size: 13px; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 8px 14px; margin-bottom: 20px; display: inline-block; }
+  .reveal-card .btn { padding: 11px 14px; font-size: 13px; white-space: nowrap; }
   .confetti-layer { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; }
   .confetti-piece { position: absolute; top: -12px; width: 8px; height: 14px; border-radius: 2px; opacity: 0.9; animation-name: confetti-fall; animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94); animation-fill-mode: forwards; }
   @keyframes confetti-fall { to { transform: translateY(420px) rotate(340deg); opacity: 0; } }
@@ -343,7 +344,10 @@
       <div class="reveal-num" id="reveal-num"></div>
       <div class="reveal-title" id="reveal-title"></div>
       <div class="reveal-stat" id="reveal-stat"></div>
-      <button type="button" class="btn" id="reveal-close">컬렉션에 담았어요</button>
+      <div style="display:flex; gap:8px; justify-content:center;">
+        <button type="button" class="btn" id="reveal-close">컬렉션에 담았어요</button>
+        <button type="button" class="btn ghost" id="reveal-undo">실수로 눌렀어요</button>
+      </div>
     </div>
   </div>
 
@@ -748,7 +752,9 @@
   }
 
   var CATCH_PHRASES = ["너로 정했다!", "갓챠!", "찾았다!", "획득 완료!"];
+  var revealedItemId = null;
   function showRevealCard(item, ownedCount) {
+    revealedItemId = item.id;
     var catchEl = document.getElementById("reveal-catch");
     catchEl.innerHTML = "";
     var sparkIcon = '<svg class="ico-sparkle"><use href="#ico-sparkle"/></svg>';
@@ -765,12 +771,20 @@
   document.getElementById("reveal-close").addEventListener("click", function () {
     document.getElementById("reveal-panel").hidden = true;
   });
+  document.getElementById("reveal-undo").addEventListener("click", function () {
+    document.getElementById("reveal-panel").hidden = true;
+    if (revealedItemId != null) { toggleOwn(revealedItemId); revealedItemId = null; }
+  });
 
-  var togglePending = {};
+  var toggleQueue = {};
   function toggleOwn(id) {
-    if (togglePending[id]) return;
-    togglePending[id] = true;
+    var prev = toggleQueue[id] || Promise.resolve();
+    var next = prev.then(function () { return doToggleOwn(id); });
+    toggleQueue[id] = next;
+    return next;
+  }
 
+  function doToggleOwn(id) {
     STATE.myOwned = STATE.myOwned || [];
     var idx = STATE.myOwned.indexOf(id);
     var wasOwned = idx !== -1;
@@ -782,7 +796,7 @@
     }
     renderChecklist();
 
-    apiPost({ type: "toggle_own", id: id }).then(function (freshState) {
+    return apiPost({ type: "toggle_own", id: id }).then(function (freshState) {
       STATE = freshState;
       renderChecklist();
       renderLeaderboard();
@@ -793,8 +807,6 @@
       renderChecklist();
       if (err.code === "login_required") { window.location.href = "/api/auth/login"; return; }
       showError();
-    }).finally(function () {
-      delete togglePending[id];
     });
   }
 
