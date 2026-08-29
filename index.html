@@ -176,6 +176,22 @@
   .inbox-context { font-size: 11.5px; color: var(--ink-soft); margin: 4px 0 6px; line-height: 1.4; }
   .inbox-bubble { background: var(--paper-raised); border-radius: 14px; padding: 10px 13px; font-size: 14px; color: var(--ink); line-height: 1.5; white-space: pre-wrap; }
   .inbox-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
+  .reveal-card {
+    position: relative; z-index: 2; background: var(--paper-glass); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%);
+    border: 1px solid var(--rule); border-radius: 24px; padding: 32px 28px 26px; max-width: 320px; width: 100%;
+    text-align: center; box-shadow: 0 24px 48px -20px rgba(74,51,47,0.35);
+    animation: reveal-flip 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes reveal-flip { from { transform: rotateY(90deg) scale(0.85); opacity: 0; } to { transform: rotateY(0) scale(1); opacity: 1; } }
+  .reveal-band { width: 54px; height: 14px; border-radius: 999px; margin: 0 auto 14px; }
+  .reveal-band.lit { background: var(--lit); }
+  .reveal-band.poem { background: var(--poem); }
+  .reveal-num { font-family: 'Jalnan2', sans-serif; font-size: 14px; color: var(--ink-soft); margin-bottom: 6px; }
+  .reveal-title { font-family: 'Jalnan2', 'Gowun Dodum', sans-serif; font-size: 24px; color: var(--ink); margin-bottom: 14px; line-height: 1.35; text-wrap: balance; }
+  .reveal-stat { font-size: 13px; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 8px 14px; margin-bottom: 20px; display: inline-block; }
+  .confetti-layer { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; }
+  .confetti-piece { position: absolute; top: -12px; width: 8px; height: 14px; border-radius: 2px; opacity: 0.9; animation-name: confetti-fall; animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94); animation-fill-mode: forwards; }
+  @keyframes confetti-fall { to { transform: translateY(420px) rotate(340deg); opacity: 0; } }
   @media (max-width: 480px) { form.panel .row { grid-template-columns: 1fr; } .shelf { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); } }
 </style>
 </head>
@@ -216,6 +232,17 @@
         <button type="button" class="btn" id="compose-send">보내기</button>
         <button type="button" class="btn ghost" id="compose-close">취소</button>
       </div>
+    </div>
+  </div>
+
+  <div class="panel-pop" id="reveal-panel" hidden>
+    <div class="confetti-layer" id="confetti-layer"></div>
+    <div class="reveal-card" id="reveal-card">
+      <div class="reveal-band" id="reveal-band"></div>
+      <div class="reveal-num" id="reveal-num"></div>
+      <div class="reveal-title" id="reveal-title"></div>
+      <div class="reveal-stat" id="reveal-stat"></div>
+      <button type="button" class="btn" id="reveal-close">컬렉션에 담았어요</button>
     </div>
   </div>
 
@@ -569,6 +596,34 @@
     }
   }
 
+  var CONFETTI_COLORS = ["#ff7a93", "#f0a63e", "#97a9e8", "#f2a0b3", "#2fa876"];
+  function burstConfetti() {
+    var layer = document.getElementById("confetti-layer");
+    layer.innerHTML = "";
+    for (var i = 0; i < 26; i++) {
+      var piece = document.createElement("span");
+      piece.className = "confetti-piece";
+      piece.style.left = Math.random() * 100 + "%";
+      piece.style.background = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+      piece.style.animationDuration = 1.1 + Math.random() * 0.9 + "s";
+      piece.style.animationDelay = Math.random() * 0.25 + "s";
+      layer.appendChild(piece);
+    }
+  }
+
+  function showRevealCard(item, ownedCount) {
+    document.getElementById("reveal-band").className = "reveal-band " + item.category;
+    document.getElementById("reveal-num").textContent = "#" + item.id;
+    document.getElementById("reveal-title").textContent = item.title;
+    document.getElementById("reveal-stat").textContent =
+      ownedCount > 1 ? ownedCount + "명이 같이 갖고 있어요" : "지금 나만 갖고 있어요, 첫 주인이에요";
+    document.getElementById("reveal-panel").hidden = false;
+    burstConfetti();
+  }
+  document.getElementById("reveal-close").addEventListener("click", function () {
+    document.getElementById("reveal-panel").hidden = true;
+  });
+
   var togglePending = {};
   async function toggleOwn(id) {
     if (togglePending[id]) return;
@@ -585,6 +640,10 @@
       STATE = freshState;
       renderChecklist();
       renderLeaderboard();
+      if (!wasOwned) {
+        var item = STATE.checklist.filter(function (i) { return i.id === id; })[0];
+        if (item) showRevealCard(item, item.ownerCount || 1);
+      }
     } catch (err) {
       if (wasOwned) { STATE.myOwned.push(id); } else {
         var i2 = STATE.myOwned.indexOf(id); if (i2 !== -1) STATE.myOwned.splice(i2, 1);

@@ -42,13 +42,23 @@ async function getLeaderboard() {
   }));
 }
 
+async function getItemOwnerCounts() {
+  const pipeline = redis.pipeline();
+  for (let id = 1; id <= 20; id++) pipeline.scard(`item_owners:${id}`);
+  const counts = await pipeline.exec();
+  const result = {};
+  for (let id = 1; id <= 20; id++) result[id] = Number(counts[id - 1]) || 0;
+  return result;
+}
+
 async function getState(uid) {
-  const [checklistRaw, tradesRaw, restocksRaw, owned, leaderboard] = await Promise.all([
+  const [checklistRaw, tradesRaw, restocksRaw, owned, leaderboard, ownerCounts] = await Promise.all([
     redis.hgetall("checklist"),
     redis.hgetall("trades"),
     redis.hgetall("restocks"),
     uid ? redis.smembers(`owned:${uid}`) : Promise.resolve([]),
     getLeaderboard(),
+    getItemOwnerCounts(),
   ]);
 
   const checklist = [];
@@ -62,7 +72,7 @@ async function getState(uid) {
         note = parsed.note || null;
       } catch (e) { /* ignore malformed */ }
     }
-    checklist.push({ id, category: CATEGORY_BY_ID[id], title, note });
+    checklist.push({ id, category: CATEGORY_BY_ID[id], title, note, ownerCount: ownerCounts[id] });
   }
 
   const myOwned = (owned || []).map(Number).filter((n) => Number.isInteger(n));
@@ -178,11 +188,12 @@ module.exports = async (req, res) => {
           return;
         }
         const key = `owned:${session.uid}`;
+        const itemOwnersKey = `item_owners:${id}`;
         const isOwned = await redis.sismember(key, id);
         if (isOwned) {
-          await redis.srem(key, id);
+          await Promise.all([redis.srem(key, id), redis.srem(itemOwnersKey, session.uid)]);
         } else {
-          await redis.sadd(key, id);
+          await Promise.all([redis.sadd(key, id), redis.sadd(itemOwnersKey, session.uid)]);
         }
         const newCount = await redis.scard(key);
         await Promise.all([
