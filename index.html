@@ -40,17 +40,35 @@
     --paper-glass: rgba(255,246,239,0.72); --raised-glass: rgba(255,236,225,0.55);
     --shadow: 0 2px 0 rgba(74,51,47,0.04), 0 14px 26px -18px rgba(255,122,147,0.45);
   }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --paper: #241a1d; --paper-raised: #34252a; --ink: #f6e8e2; --ink-soft: #c9aea5;
-      --rule: #4a3540; --accent: #ff9fb2; --accent-soft: #3d2830; --wine: #ff9daf;
-      --wine-soft: #402a30; --brass: #f0c674; --lit: #b7c4f2; --poem: #f7bcca;
-      --mint: #6bd6a4; --mint-soft: #23352e;
-      --paper-glass: rgba(36,26,29,0.68); --raised-glass: rgba(52,37,42,0.55);
-      --shadow: 0 2px 0 rgba(0,0,0,0.3), 0 14px 26px -18px rgba(0,0,0,0.6);
-    }
+  /*
+    색은 기기의 다크모드 설정이 아니라 "지금 몇 시인가"로 정해진다.
+    새벽/아침/오후/저녁/밤 다섯 톤앤매너를 데이터 속성(data-daypart)으로 전환한다.
+  */
+  :root[data-daypart="dawn"] {
+    --paper: #1c2033; --paper-raised: #272c47; --ink: #e6e4f2; --ink-soft: #a3a4c4;
+    --rule: #3a3d61; --accent: #8fa3e0; --accent-soft: #2a2f4f; --wine: #9db3f0;
+    --wine-soft: #2a2f4f; --brass: #d9c98f; --lit: #aebdf0; --poem: #c9b8f0;
+    --mint: #7fd6c2; --mint-soft: #1f3535;
+    --paper-glass: rgba(28,32,51,0.72); --raised-glass: rgba(39,44,71,0.55);
+    --shadow: 0 2px 0 rgba(0,0,0,0.25), 0 14px 26px -18px rgba(0,0,0,0.5);
   }
-  :root[data-theme="dark"] {
+  :root[data-daypart="morning"] {
+    --paper: #f7fbef; --paper-raised: #edf5df; --ink: #33422c; --ink-soft: #8b9a7c;
+    --rule: #dcead0; --accent: #7ec98f; --accent-soft: #e2f5e6; --wine: #e8546f;
+    --wine-soft: #ffe1e7; --brass: #d9a63e; --lit: #97c9e8; --poem: #f2a0b3;
+    --mint: #2fa876; --mint-soft: #e2f7ee;
+    --paper-glass: rgba(247,251,239,0.72); --raised-glass: rgba(237,245,223,0.55);
+    --shadow: 0 2px 0 rgba(51,66,44,0.05), 0 14px 26px -18px rgba(126,201,143,0.4);
+  }
+  :root[data-daypart="evening"] {
+    --paper: #fff1e6; --paper-raised: #ffe4d0; --ink: #4a332f; --ink-soft: #a8877a;
+    --rule: #f5d0b8; --accent: #ff8f6b; --accent-soft: #ffe3d5; --wine: #e8546f;
+    --wine-soft: #ffe1e7; --brass: #f0a63e; --lit: #97a9e8; --poem: #f2a0b3;
+    --mint: #2fa876; --mint-soft: #e2f7ee;
+    --paper-glass: rgba(255,241,230,0.72); --raised-glass: rgba(255,228,208,0.55);
+    --shadow: 0 2px 0 rgba(74,51,47,0.05), 0 14px 26px -18px rgba(255,143,107,0.4);
+  }
+  :root[data-daypart="night"] {
     --paper: #241a1d; --paper-raised: #34252a; --ink: #f6e8e2; --ink-soft: #c9aea5;
     --rule: #4a3540; --accent: #ff9fb2; --accent-soft: #3d2830; --wine: #ff9daf;
     --wine-soft: #402a30; --brass: #f0c674; --lit: #b7c4f2; --poem: #f7bcca;
@@ -58,19 +76,13 @@
     --paper-glass: rgba(36,26,29,0.68); --raised-glass: rgba(52,37,42,0.55);
     --shadow: 0 2px 0 rgba(0,0,0,0.3), 0 14px 26px -18px rgba(0,0,0,0.6);
   }
-  :root { --daypart-glow: var(--accent-soft); --daypart-accent: var(--accent); }
-  :root[data-daypart="dawn"] { --daypart-glow: #dde4f7; --daypart-accent: #8fa3e0; }
-  :root[data-daypart="morning"] { --daypart-glow: #e8f6de; --daypart-accent: #7ec98f; }
-  :root[data-daypart="afternoon"] { --daypart-glow: #fff1c2; --daypart-accent: #f0a63e; }
-  :root[data-daypart="evening"] { --daypart-glow: #ffd9c2; --daypart-accent: #ff8f6b; }
-  :root[data-daypart="night"] { --daypart-glow: #ded8f5; --daypart-accent: #9081d6; }
   * { box-sizing: border-box; }
   html { overflow-x: hidden; }
   body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Gowun Dodum', 'Noto Sans KR', 'Malgun Gothic', sans-serif; line-height: 1.65; -webkit-font-smoothing: antialiased; overflow-x: hidden; max-width: 100vw; }
   .wrap { max-width: 760px; margin: 0 auto; padding: 24px 20px calc(96px + env(safe-area-inset-bottom, 0px)); position: relative; }
   .wrap::before {
     content: ""; position: absolute; top: -60px; right: -80px; width: 280px; height: 280px;
-    background: radial-gradient(circle, var(--daypart-glow) 0%, transparent 72%);
+    background: radial-gradient(circle, var(--accent-soft) 0%, transparent 72%);
     transition: background 0.6s ease;
     border-radius: 50%; z-index: -1; pointer-events: none;
   }
@@ -108,6 +120,10 @@
   .spine .own-mark { position: absolute; top: 6px; right: 6px; width: 18px; height: 18px; border-radius: 50%; background: var(--mint); color: var(--paper); font-size: 10px; display: flex; align-items: center; justify-content: center; animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
   .spine .own-mark svg { width: 11px; height: 11px; }
   .spine { position: relative; }
+  .sheet-total { display: flex; align-items: center; justify-content: center; gap: 7px; margin: 22px auto 0; max-width: 320px; background: linear-gradient(135deg, var(--accent-soft), var(--wine-soft)); border: 1px solid var(--rule); border-radius: 999px; padding: 12px 20px; font-size: 13.5px; color: var(--ink); text-align: center; }
+  .sheet-total .ico-sparkle { width: 15px; height: 15px; color: var(--accent); animation: twinkle 2.4s ease-in-out infinite; flex: 0 0 auto; }
+  .sheet-total b { font-family: 'Jalnan2', sans-serif; font-size: 17px; color: var(--accent); font-weight: 400; margin: 0 2px; }
+  .spine .own-mark.qty { width: auto; min-width: 18px; padding: 0 5px; border-radius: 999px; font-size: 9.5px; font-weight: 800; letter-spacing: 0.01em; }
   .mycollect { display: flex; align-items: center; gap: 10px; margin: 14px 0 22px; font-size: 13px; color: var(--ink-soft); }
   .mycollect-bar { flex: 1; height: 8px; background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; }
   .mycollect-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--poem)); width: 0%; transition: width 0.3s ease; border-radius: 999px; }
@@ -222,10 +238,10 @@
   @keyframes float-y { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
   @keyframes pop-in { from { transform: scale(0.4); opacity: 0; } 70% { transform: scale(1.15); } to { transform: scale(1); opacity: 1; } }
 
-  .deco-sparkles { position: absolute; top: 6px; right: 24px; width: 120px; height: 90px; pointer-events: none; z-index: -1; color: var(--daypart-accent); }
+  .deco-sparkles { position: absolute; top: 6px; right: 24px; width: 120px; height: 90px; pointer-events: none; z-index: -1; color: var(--accent); }
   .daypart-mood { font-size: 12.5px; color: var(--ink-soft); margin: -6px 0 18px; display: flex; align-items: center; gap: 5px; }
   .deco-sparkles .ico-sparkle { position: absolute; }
-  .deco-sparkles .s1 { top: 4px; right: 10px; width: 20px; height: 20px; animation: twinkle 2.4s ease-in-out infinite, float-y 5s ease-in-out infinite; color: var(--daypart-accent); transition: color 0.6s ease; }
+  .deco-sparkles .s1 { top: 4px; right: 10px; width: 20px; height: 20px; animation: twinkle 2.4s ease-in-out infinite, float-y 5s ease-in-out infinite; color: var(--accent); transition: color 0.6s ease; }
   .deco-sparkles .s2 { top: 46px; right: 66px; width: 13px; height: 13px; animation: twinkle 2.8s ease-in-out infinite 0.6s, float-y 4.2s ease-in-out infinite 0.3s; color: var(--poem); }
   .deco-sparkles .s3 { top: 66px; right: 20px; width: 10px; height: 10px; animation: twinkle 2.1s ease-in-out infinite 1.1s, float-y 4.8s ease-in-out infinite 0.8s; color: var(--brass); }
 
@@ -272,6 +288,13 @@
   .rank-row .rank-name { flex: 1; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   @media (max-width: 480px) { form.panel .row { grid-template-columns: 1fr; } .shelf { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); } }
 </style>
+<script>
+  (function () {
+    var h = new Date().getHours();
+    var part = (h >= 4 && h < 7) ? "dawn" : (h >= 7 && h < 11) ? "morning" : (h >= 11 && h < 17) ? "afternoon" : (h >= 17 && h < 20) ? "evening" : "night";
+    document.documentElement.setAttribute("data-daypart", part);
+  })();
+</script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -427,6 +450,23 @@
     </div>
   </div>
 
+  <div class="panel-pop" id="qty-panel" hidden>
+    <div class="panel-pop-inner" style="text-align:center;">
+      <div class="reveal-band" id="qty-band" style="margin-bottom:10px;"></div>
+      <div class="reveal-num" id="qty-num"></div>
+      <div class="reveal-title" id="qty-title" style="font-size:19px; margin-bottom:16px;"></div>
+      <div style="display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:18px;">
+        <button type="button" class="btn ghost" id="qty-minus" style="padding:9px 16px; font-size:18px; line-height:1;">－</button>
+        <div><span id="qty-value" style="font-family:'Jalnan2',sans-serif; font-size:30px;">1</span><span style="font-size:13px; color:var(--ink-soft);">장</span></div>
+        <button type="button" class="btn ghost" id="qty-plus" style="padding:9px 16px; font-size:18px; line-height:1;">＋</button>
+      </div>
+      <div style="display:flex; gap:8px; justify-content:center;">
+        <button type="button" class="btn" id="qty-close">닫기</button>
+        <button type="button" class="btn ghost" id="qty-remove">컬렉션에서 빼기</button>
+      </div>
+    </div>
+  </div>
+
   <div class="panel-pop" id="reveal-panel" hidden>
     <div class="confetti-layer" id="confetti-layer"></div>
     <div class="reveal-card" id="reveal-card">
@@ -471,6 +511,10 @@
     </div>
     <div class="shelf-group"><div class="shelf-label">세계문학전집 (15종)</div><div class="shelf" id="shelf-lit"></div></div>
     <div class="shelf-group"><div class="shelf-label">시집 (5종)</div><div class="shelf" id="shelf-poem"></div></div>
+    <div class="sheet-total" id="sheet-total" hidden>
+      <svg class="ico-sparkle"><use href="#ico-sparkle"/></svg>
+      지금까지 모은 책갈피, 중복 포함 총 <b id="sheet-total-num">0</b>장
+    </div>
     <form class="panel" id="form-identify" hidden>
       <div id="identify-target-label" style="font-weight:600;"></div>
       <div><label for="identify-title">책 제목 (저자도 함께 적어주면 좋아요)</label><input id="identify-title" type="text" maxlength="60" required placeholder="예: 이방인 / 알베르 카뮈" /></div>
@@ -489,9 +533,12 @@
   <section id="sec-trade" class="tab-panel">
     <div class="sechead"><h2><svg class="ico-sparkle"><use href="#ico-sparkle"/></svg>교환 게시판</h2><span class="count" id="trade-count">0건</span></div>
     <p class="secnote">남는 책갈피와 필요한 책갈피를 적어두면 서로 찾을 수 있어요. 번개장터 같은 범용 중고거래와 달리 도감 20종 기준으로 정확히 매칭돼요. 만남/택배는 각자 연락처로 정해주세요.</p>
+    <button type="button" class="geo-btn" id="trade-match-btn">🔁 나와 매치되는 글만 보기</button>
     <form class="panel" id="form-trade">
       <div class="row">
-        <div><label for="trade-have">보유 중 <button type="button" class="link-btn" id="fill-have" style="margin-left:4px;">내 컬렉션으로 채우기</button></label><input id="trade-have" type="text" maxlength="60" required placeholder="예: 이방인, 오만과 편견" /></div>
+        <div><label for="trade-have">보유 중 <button type="button" class="link-btn" id="fill-have" style="margin-left:4px;">내 컬렉션으로 채우기</button></label><input id="trade-have" type="text" maxlength="60" required placeholder="예: 이방인, 오만과 편견" />
+          <label style="display:flex; align-items:center; gap:5px; margin:6px 0 0; font-size:11.5px; cursor:pointer;"><input type="checkbox" id="fill-have-surplus-only" checked style="width:auto; margin:0;" />여분만 채우기 (2장 이상 가진 것만)</label>
+        </div>
         <div><label for="trade-want">필요함 <button type="button" class="link-btn" id="fill-want" style="margin-left:4px;">안 가진 것 자동 채우기</button></label><input id="trade-want" type="text" maxlength="60" required placeholder="예: 시집 5종 중 아무거나" /></div>
       </div>
       <div class="row">
@@ -557,13 +604,11 @@
     evening: { emoji: "🌇", text: "노을 지는 저녁, 하루를 마무리하는 페이지" },
     night: { emoji: "✨", text: "깊은 밤, 책과 함께 조용히" },
   };
-  (function applyDaypart() {
-    var h = new Date().getHours();
-    var part = (h >= 4 && h < 7) ? "dawn" : (h >= 7 && h < 11) ? "morning" : (h >= 11 && h < 17) ? "afternoon" : (h >= 17 && h < 20) ? "evening" : "night";
-    document.documentElement.setAttribute("data-daypart", part);
+  (function applyDaypartMood() {
+    var part = document.documentElement.getAttribute("data-daypart") || "afternoon";
     var mood = DAYPART_MOODS[part];
     var el = document.getElementById("daypart-mood");
-    if (el) el.textContent = mood.emoji + " " + mood.text;
+    if (el && mood) el.textContent = mood.emoji + " " + mood.text;
   })();
 
   var BLOB_IDS = ["ico-blob-puppy", "ico-blob-rabbit", "ico-blob-frog", "ico-blob-mochi", "ico-blob-glasses", "ico-blob-dino", "ico-mascot"];
@@ -630,7 +675,7 @@
 
   var GU_LIST =["종로구","중구","용산구","성동구","광진구","동대문구","중랑구","성북구","강북구","도봉구","노원구","은평구","서대문구","마포구","양천구","강서구","구로구","금천구","영등포구","동작구","관악구","서초구","강남구","송파구","강동구"];
 
-  var STATE = { checklist: [], trades: [], restocks: [], leaderboard: [] };
+  var STATE = { checklist: [], trades: [], restocks: [], leaderboard: [], myQty: {} };
   var STORES = [];
 
   function fmtTime(ts) {
@@ -844,9 +889,12 @@
     var poemEl = document.getElementById("shelf-poem");
     litEl.innerHTML = ""; poemEl.innerHTML = "";
     var confirmed = 0;
-    var owned = (STATE.myOwned || []);
+    var qtyMap = STATE.myQty || {};
+    var ownedCount = 0, totalSheets = 0;
     STATE.checklist.forEach(function (item) {
-      var isOwned = owned.indexOf(item.id) !== -1;
+      var qty = qtyMap[item.id] || 0;
+      var isOwned = qty > 0;
+      if (isOwned) { ownedCount++; totalSheets += qty; }
       var btn = document.createElement("button");
       btn.type = "button";
       btn.className = "spine " + item.category + " " + (item.title ? "filled" : "empty") + (isOwned ? " owned" : "");
@@ -855,16 +903,17 @@
       var title = document.createElement("div"); title.className = "title"; title.textContent = item.title ? item.title : "미확인";
       btn.appendChild(band); btn.appendChild(num); btn.appendChild(title);
       if (isOwned) {
-        var mark = document.createElement("div"); mark.className = "own-mark";
-        mark.innerHTML = '<svg><use href="#ico-heart"/></svg>';
+        var mark = document.createElement("div"); mark.className = "own-mark qty";
+        mark.textContent = "×" + qty;
         btn.appendChild(mark);
       }
       btn.title = item.title
-        ? (STATE.me ? "탭: 내 컬렉션 " + (isOwned ? "해제" : "체크") : "로그인하면 내 컬렉션에 체크할 수 있어요")
+        ? (STATE.me ? (isOwned ? "탭: 보유 " + qty + "장 관리하기" : "탭: 내 컬렉션에 체크") : "로그인하면 내 컬렉션에 체크할 수 있어요")
         : "탭: 어떤 책갈피인지 제보";
       btn.addEventListener("click", function () {
         if (!STATE.me) { window.location.href = "/api/auth/login"; return; }
-        if (item.title) { toggleOwn(item.id); } else { openIdentify(item.id); }
+        if (!item.title) { openIdentify(item.id); return; }
+        if (isOwned) { openQtyPanel(item, qty); } else { adjustQty(item.id, 1); }
       });
       if (item.title) confirmed++;
       (item.category === "lit" ? litEl : poemEl).appendChild(btn);
@@ -872,11 +921,12 @@
     document.getElementById("checklist-count").textContent = confirmed + "/20 확인됨";
 
     var mc = document.getElementById("mycollect");
+    var st = document.getElementById("sheet-total");
     if (STATE.me) {
       mc.hidden = false;
-      var pct = Math.round((owned.length / 20) * 100);
+      var pct = Math.round((ownedCount / 20) * 100);
       document.getElementById("mycollect-fill").style.width = pct + "%";
-      document.getElementById("mycollect-label").textContent = "내 컬렉션 " + owned.length + "/20";
+      document.getElementById("mycollect-label").textContent = "내 컬렉션 " + ownedCount + "/20";
       var spark = document.getElementById("mycollect-spark");
       if (!spark) {
         document.getElementById("mycollect-bar").insertAdjacentHTML(
@@ -886,8 +936,12 @@
         spark = document.getElementById("mycollect-spark");
       }
       spark.style.left = pct + "%";
+
+      st.hidden = totalSheets === 0;
+      document.getElementById("sheet-total-num").textContent = totalSheets;
     } else {
       mc.hidden = true;
+      st.hidden = true;
     }
   }
 
@@ -928,32 +982,70 @@
   });
   document.getElementById("reveal-undo").addEventListener("click", function () {
     document.getElementById("reveal-panel").hidden = true;
-    if (revealedItemId != null) { toggleOwn(revealedItemId); revealedItemId = null; }
+    if (revealedItemId != null) { adjustQty(revealedItemId, -1); revealedItemId = null; }
   });
 
-  var toggleSyncQueue = {};
-  function toggleOwn(id) {
-    // Optimistic UI update happens immediately on every click — never waits on network.
-    STATE.myOwned = STATE.myOwned || [];
-    var idx = STATE.myOwned.indexOf(id);
-    var wasOwned = idx !== -1;
-    if (wasOwned) { STATE.myOwned.splice(idx, 1); } else { STATE.myOwned.push(id); }
+  var qtyPanelItemId = null;
+  function openQtyPanel(item, qty) {
+    qtyPanelItemId = item.id;
+    document.getElementById("qty-band").className = "reveal-band " + item.category;
+    document.getElementById("qty-num").textContent = "#" + item.id;
+    document.getElementById("qty-title").textContent = item.title;
+    document.getElementById("qty-value").textContent = qty;
+    document.getElementById("qty-panel").hidden = false;
+  }
+  function updateQtyPanelIfOpen(id) {
+    var panel = document.getElementById("qty-panel");
+    if (qtyPanelItemId !== id || panel.hidden) return;
+    var qty = (STATE.myQty && STATE.myQty[id]) || 0;
+    if (qty === 0) { panel.hidden = true; qtyPanelItemId = null; return; }
+    document.getElementById("qty-value").textContent = qty;
+  }
+  document.getElementById("qty-plus").addEventListener("click", function () {
+    if (qtyPanelItemId != null) adjustQty(qtyPanelItemId, 1);
+  });
+  document.getElementById("qty-minus").addEventListener("click", function () {
+    if (qtyPanelItemId != null) adjustQty(qtyPanelItemId, -1);
+  });
+  document.getElementById("qty-remove").addEventListener("click", function () {
+    if (qtyPanelItemId == null) return;
+    var id = qtyPanelItemId;
+    var qty = (STATE.myQty && STATE.myQty[id]) || 0;
+    document.getElementById("qty-panel").hidden = true;
+    qtyPanelItemId = null;
+    for (var i = 0; i < qty; i++) adjustQty(id, -1);
+  });
+  document.getElementById("qty-close").addEventListener("click", function () {
+    document.getElementById("qty-panel").hidden = true;
+    qtyPanelItemId = null;
+  });
 
-    if (!wasOwned) {
+  var qtySyncQueue = {};
+  function adjustQty(id, delta) {
+    // Optimistic UI update happens immediately on every click — never waits on network.
+    STATE.myQty = STATE.myQty || {};
+    var prevQty = STATE.myQty[id] || 0;
+    var newQty = Math.max(0, Math.min(99, prevQty + delta));
+    if (newQty === 0) { delete STATE.myQty[id]; } else { STATE.myQty[id] = newQty; }
+    STATE.myOwned = Object.keys(STATE.myQty).map(Number);
+
+    if (delta > 0 && prevQty === 0) {
       var item = STATE.checklist.filter(function (i) { return i.id === id; })[0];
       if (item) { item.ownerCount = (item.ownerCount || 0) + 1; showRevealCard(item, item.ownerCount); }
     }
     renderChecklist();
+    updateQtyPanelIfOpen(id);
 
     // Server sync is serialized per id in the background so rapid taps land in order,
     // but a failed/slow sync never blocks the next tap's optimistic update above.
-    var prevSync = toggleSyncQueue[id] || Promise.resolve();
-    toggleSyncQueue[id] = prevSync.catch(function () {}).then(function () {
-      return apiPost({ type: "toggle_own", id: id }).then(function (freshState) {
-        // Merge only server-authoritative fields (leaderboard, ownerCount, titles).
-        // Never overwrite STATE.myOwned here: another toggle may have optimistically
-        // changed it while this request was in flight, and this response would be stale.
+    var prevSync = qtySyncQueue[id] || Promise.resolve();
+    qtySyncQueue[id] = prevSync.catch(function () {}).then(function () {
+      return apiPost({ type: "adjust_qty", id: id, delta: delta }).then(function (freshState) {
+        // Merge only server-authoritative fields (leaderboard, ownerCount, titles, quantities).
+        // Never build STATE.myQty from a snapshot older than the latest optimistic tap.
         STATE.leaderboard = freshState.leaderboard;
+        STATE.myQty = freshState.myQty || {};
+        STATE.myOwned = freshState.myOwned || [];
         var freshById = {};
         freshState.checklist.forEach(function (f) { freshById[f.id] = f; });
         STATE.checklist.forEach(function (it) {
@@ -962,11 +1054,12 @@
         });
         renderChecklist();
         renderLeaderboard();
+        updateQtyPanelIfOpen(id);
       }).catch(function (err) {
-        if (wasOwned) { STATE.myOwned.push(id); } else {
-          var i2 = STATE.myOwned.indexOf(id); if (i2 !== -1) STATE.myOwned.splice(i2, 1);
-        }
+        if (prevQty === 0) { delete STATE.myQty[id]; } else { STATE.myQty[id] = prevQty; }
+        STATE.myOwned = Object.keys(STATE.myQty).map(Number);
         renderChecklist();
+        updateQtyPanelIfOpen(id);
         if (err.code === "login_required") { window.location.href = "/api/auth/login"; return; }
         showError();
       });
@@ -1058,15 +1151,36 @@
     }
   });
 
+  function normalizeText(s) { return (s || "").toLowerCase(); }
+  function textContainsTitle(text, title) {
+    return !!title && normalizeText(text).indexOf(normalizeText(title)) !== -1;
+  }
+  function isMatchTrade(t) {
+    if (!STATE.me) return false;
+    var qtyMap = STATE.myQty || {};
+    var myOwnedTitles = STATE.checklist.filter(function (i) { return (qtyMap[i.id] || 0) > 0 && i.title; }).map(function (i) { return i.title; });
+    var myMissingTitles = STATE.checklist.filter(function (i) { return !(qtyMap[i.id] || 0) && i.title; }).map(function (i) { return i.title; });
+    // A match means: they're offering something I'm missing, AND they need something I already have.
+    var theyOfferSomethingINeed = myMissingTitles.some(function (title) { return textContainsTitle(t.have, title); });
+    var theyNeedSomethingIHave = myOwnedTitles.some(function (title) { return textContainsTitle(t.want, title); });
+    return theyOfferSomethingINeed && theyNeedSomethingIHave;
+  }
+
+  var tradeMatchOnly = false;
   function renderTrades() {
     var list = document.getElementById("trade-list");
     list.innerHTML = "";
-    document.getElementById("trade-count").textContent = STATE.trades.length + "건";
-    if (STATE.trades.length === 0) {
-      var p = document.createElement("p"); p.className = "empty-hint"; p.innerHTML = '<svg class="ico-heart"><use href="#ico-heart"/></svg>아직 등록된 교환 글이 없어요. 첫 글을 올려보세요.';
+    var trades = STATE.trades.slice().reverse();
+    if (tradeMatchOnly) trades = trades.filter(isMatchTrade);
+    document.getElementById("trade-count").textContent = trades.length + "건" + (tradeMatchOnly ? " · 매치" : "");
+    if (trades.length === 0) {
+      var p = document.createElement("p"); p.className = "empty-hint";
+      p.innerHTML = tradeMatchOnly
+        ? '<svg class="ico-heart"><use href="#ico-heart"/></svg>지금은 나와 매치되는 글이 없어요. 컬렉션을 더 채우거나 나중에 다시 확인해보세요.'
+        : '<svg class="ico-heart"><use href="#ico-heart"/></svg>아직 등록된 교환 글이 없어요. 첫 글을 올려보세요.';
       list.appendChild(p); return;
     }
-    STATE.trades.slice().reverse().forEach(function (t) {
+    trades.forEach(function (t) {
       var card = document.createElement("div"); card.className = "card";
       var authorRow = document.createElement("div"); authorRow.className = "author-row";
       var av = document.createElement("span"); av.className = "avatar"; av.style.width = "22px"; av.style.height = "22px";
@@ -1106,9 +1220,12 @@
 
   document.getElementById("fill-have").addEventListener("click", function () {
     if (!STATE.me) { window.location.href = "/api/auth/login"; return; }
-    var owned = (STATE.myOwned || []);
-    var titles = STATE.checklist.filter(function (i) { return owned.indexOf(i.id) !== -1 && i.title; }).map(function (i) { return i.title; });
-    document.getElementById("trade-have").value = titles.join(", ") || "아직 체크한 컬렉션이 없어요";
+    var qtyMap = STATE.myQty || {};
+    var surplusOnly = document.getElementById("fill-have-surplus-only").checked;
+    var minQty = surplusOnly ? 2 : 1;
+    var titles = STATE.checklist.filter(function (i) { return (qtyMap[i.id] || 0) >= minQty && i.title; }).map(function (i) { return i.title; });
+    document.getElementById("trade-have").value = titles.join(", ") ||
+      (surplusOnly ? "여분(2장 이상)으로 가진 게 없어요" : "아직 체크한 컬렉션이 없어요");
   });
 
   document.getElementById("fill-want").addEventListener("click", function () {
@@ -1116,6 +1233,13 @@
     var owned = (STATE.myOwned || []);
     var titles = STATE.checklist.filter(function (i) { return owned.indexOf(i.id) === -1 && i.title; }).map(function (i) { return i.title; });
     document.getElementById("trade-want").value = titles.join(", ") || "다 갖고 계세요!";
+  });
+
+  document.getElementById("trade-match-btn").addEventListener("click", function () {
+    if (!STATE.me) { window.location.href = "/api/auth/login"; return; }
+    tradeMatchOnly = !tradeMatchOnly;
+    this.textContent = tradeMatchOnly ? "🔁 전체 글 다시 보기" : "🔁 나와 매치되는 글만 보기";
+    renderTrades();
   });
 
   document.getElementById("form-trade").addEventListener("submit", async function (e) {

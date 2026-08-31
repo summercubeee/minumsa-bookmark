@@ -52,12 +52,34 @@ async function getItemOwnerCounts() {
   return result;
 }
 
+async function getOwnedQty(uid) {
+  if (!uid) return {};
+  const qtyHash = await redis.hgetall(`owned_qty:${uid}`);
+  if (qtyHash && Object.keys(qtyHash).length > 0) {
+    const map = {};
+    for (const [id, qty] of Object.entries(qtyHash)) map[id] = Number(qty) || 0;
+    return map;
+  }
+  // Migrate legacy boolean ownership (a Set of owned ids) to qty=1 the first time
+  // a user with old data is read, so nobody's collection appears to reset.
+  const legacy = await redis.smembers(`owned:${uid}`);
+  if (legacy && legacy.length > 0) {
+    const migrated = {};
+    for (const id of legacy) migrated[id] = "1";
+    await redis.hset(`owned_qty:${uid}`, migrated);
+    const map = {};
+    for (const id of legacy) map[id] = 1;
+    return map;
+  }
+  return {};
+}
+
 async function getState(uid) {
-  const [checklistRaw, tradesRaw, restocksRaw, owned, leaderboard, ownerCounts] = await Promise.all([
+  const [checklistRaw, tradesRaw, restocksRaw, qtyMap, leaderboard, ownerCounts] = await Promise.all([
     redis.hgetall("checklist"),
     redis.hgetall("trades"),
     redis.hgetall("restocks"),
-    uid ? redis.smembers(`owned:${uid}`) : Promise.resolve([]),
+    getOwnedQty(uid),
     getLeaderboard(),
     getItemOwnerCounts(),
   ]);
@@ -76,9 +98,14 @@ async function getState(uid) {
     checklist.push({ id, category: CATEGORY_BY_ID[id], title, note, ownerCount: ownerCounts[id] });
   }
 
-  const myOwned = (owned || []).map(Number).filter((n) => Number.isInteger(n));
+  const myQty = {};
+  let myTotalSheets = 0;
+  for (const [id, qty] of Object.entries(qtyMap)) {
+    if (qty > 0) { myQty[id] = qty; myTotalSheets += qty; }
+  }
+  const myOwned = Object.keys(myQty).map(Number);
 
-  return { checklist, trades: parseHash(tradesRaw), restocks: parseHash(restocksRaw), myOwned, leaderboard };
+  return { checklist, trades: parseHash(tradesRaw), restocks: parseHash(restocksRaw), myOwned, myQty, myTotalSheets, leaderboard };
 }
 
 async function withMe(state, uid, knownProfile) {
@@ -194,26 +221,46 @@ module.exports = async (req, res) => {
           return;
         }
         await redis.hdel(key, id);
-      } else if (type === "toggle_own") {
+      } else if (type === "adjust_qty") {
         const id = Number(body.id);
+        const delta = Number(body.delta);
         if (!Number.isInteger(id) || id < 1 || id > 20) {
           res.status(400).json({ error: "invalid_id" });
           return;
         }
-        const key = `owned:${session.uid}`;
-        const itemOwnersKey = `item_owners:${id}`;
-        const isOwned = await redis.sismember(key, id);
-        if (isOwned) {
-          await Promise.all([redis.srem(key, id), redis.srem(itemOwnersKey, session.uid)]);
-        } else {
-          await Promise.all([redis.sadd(key, id), redis.sadd(itemOwnersKey, session.uid)]);
+        if (delta !== 1 && delta !== -1) {
+          res.status(400).json({ error: "invalid_delta" });
+          return;
         }
-        const newCount = await redis.scard(key);
-        await Promise.all([
-          redis.zadd("leaderboard", { score: newCount, member: session.uid }),
-          redis.hset("user_names", { [session.uid]: profile.nickname }),
-          redis.hset("user_avatars", { [session.uid]: String(profile.avatar) }),
-        ]);
+        const qtyKey = `owned_qty:${session.uid}`;
+        const itemOwnersKey = `item_owners:${id}`;
+        // Read through getOwnedQty so a user still on legacy boolean data is
+        // migrated to the quantity hash before we adjust it.
+        const qtyMap = await getOwnedQty(session.uid);
+        const currentQty = qtyMap[id] || 0;
+        const newQty = Math.max(0, Math.min(99, currentQty + delta));
+        if (newQty !== currentQty) {
+          if (newQty === 0) {
+            await redis.hdel(qtyKey, id);
+          } else {
+            await redis.hset(qtyKey, { [id]: String(newQty) });
+          }
+          const wasOwned = currentQty > 0;
+          const isOwnedNow = newQty > 0;
+          if (wasOwned !== isOwnedNow) {
+            if (isOwnedNow) {
+              await redis.sadd(itemOwnersKey, session.uid);
+            } else {
+              await redis.srem(itemOwnersKey, session.uid);
+            }
+            const distinctCount = await redis.hlen(qtyKey);
+            await Promise.all([
+              redis.zadd("leaderboard", { score: distinctCount, member: session.uid }),
+              redis.hset("user_names", { [session.uid]: profile.nickname }),
+              redis.hset("user_avatars", { [session.uid]: String(profile.avatar) }),
+            ]);
+          }
+        }
       } else if (type === "set_nickname") {
         const nickname = clean(body.nickname, 20);
         if (!nickname || nickname.length < 2) {
